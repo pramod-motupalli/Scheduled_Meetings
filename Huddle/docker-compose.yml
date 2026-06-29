@@ -1,0 +1,113 @@
+services:
+  # ----------------------------------------------------
+  # DATABASE (POSTGRESQL)
+  # ----------------------------------------------------
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: backend
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------
+  # CACHE (REDIS)
+  # ----------------------------------------------------
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------
+  # SHARED MICROSERVICE (BUSINESS LOGIC & DATA)
+  # ----------------------------------------------------
+  microservice:
+    build:
+      context: ./microservices
+      dockerfile: docker/django/Dockerfile
+    container_name: shared-microservice
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+
+  # ----------------------------------------------------
+  # BACKEND1 (APP1 AUTHENTICATION SERVICE)
+  # ----------------------------------------------------
+  backend1:
+    build:
+      context: ./app1/backend1
+      dockerfile: Dockerfile
+    container_name: auth-backend1
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:5000
+      "
+
+  # ----------------------------------------------------
+  # BACKEND2 (APP2 AUTHENTICATION SERVICE)
+  # ----------------------------------------------------
+  #backend2:
+    #build:
+      #context: ./app2/backend2
+      #dockerfile: Dockerfile
+    #container_name: auth-backend2
+    #env_file:
+      #- .env
+    #ports:
+      #- "8003:8003"
+    #depends_on:
+      #postgres-db:
+       # condition: service_healthy
+    #command: >
+      #sh -c "
+      #python manage.py migrate &&
+      #python manage.py runserver 0.0.0.0:8003
+     # "
+
+  # ----------------------------------------------------
+  # APP1 (REACT HUDDLE APPLICATION 1)
+  # ----------------------------------------------------
+  app1:
+    build:
+      context: ./app1/frontend1
+      dockerfile: Dockerfile
+    container_name: react-app1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend1
+      - microservice
+
+ 

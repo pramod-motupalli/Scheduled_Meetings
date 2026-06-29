@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+<<<<<<< HEAD
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Virtual environments - CRITICAL
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3-journal
+media/
+!media/.gitkeep
+staticfiles/
+static/
+!static/.gitkeep
+
+# Environment variables - NEVER COMMIT
+.env
+.env.*
+!.env.example
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# mypy / type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter
+.ipynb_checkpoints
+=======
+*.pyc
+
+# Virtual environment
+venv/
+env/
+
+# Environment variables
+.env
+
+# Database
+db.sqlite3
+
+# Static/media
+staticfiles/
+media/
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.log
+>>>>>>> Team-B
