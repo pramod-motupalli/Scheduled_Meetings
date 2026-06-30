@@ -13,9 +13,6 @@ Run the following commands to create the new tables (`Company`, `Meeting`, `Part
 
 ### 2. Seed Test Data
 Run the seeding script to create a test company (`test@huddle.com` with password `password123`):
-```bash
-.\venv\Scripts\python.exe C:\Users\Ranga\.gemini\antigravity-ide\brain\c29b5d72-0766-455a-b9a3-6059163bfd92\scratch\seed.py
-```
 
 ### 3. Launching Django Development Server
 Start the server on port 8000:

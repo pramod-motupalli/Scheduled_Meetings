@@ -23,6 +23,7 @@ const VideoStage = ({
     isVideoOn,
     isMicOn,
     remoteMicStates = {},
+    remoteVideoStates = {},
     remoteStreams = [],
     roomPeers = {},
     handRaiseCount = 0,
@@ -64,7 +65,7 @@ const VideoStage = ({
             seenIds.add(cleanId);
 
             const rStream = remoteStreams.find(
-                (r) => roomPeers[r.peerId]?.user_id === p.user_id,
+                (r) => r.peerId === p.user_id || roomPeers[r.peerId]?.user_id === p.user_id,
             );
             const cleanName = p.name
                 ? p.name.replace(/_[a-zA-Z0-9]{5}$/, "")
@@ -74,10 +75,14 @@ const VideoStage = ({
                 name: cleanName,
                 isLocal: false,
                 stream: rStream ? rStream.stream : null,
-                // ✅ Default to "on" until we've actually heard otherwise for this user_id
+                // Default to "on" until we've actually heard otherwise for this user_id
                 micOn:
                     remoteMicStates[p.user_id] !== undefined
                         ? remoteMicStates[p.user_id]
+                        : true,
+                videoOn:
+                    remoteVideoStates[p.user_id] !== undefined
+                        ? remoteVideoStates[p.user_id]
                         : true,
             });
         });
@@ -91,6 +96,7 @@ const VideoStage = ({
         roomPeers,
         isMicOn,
         remoteMicStates,
+        remoteVideoStates,
     ]);
 
     // ==========================================
@@ -206,7 +212,7 @@ const VideoStage = ({
                                             : participantRows[0].length + index;
                                     const hasVideo = member.isLocal
                                         ? isVideoOn
-                                        : !!member.stream;
+                                        : !!member.stream && member.videoOn !== false;
 
                                     return (
                                         <div

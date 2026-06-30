@@ -119,7 +119,7 @@ class PasswordResetRequestView(APIView):
         send_mail(
             subject,
             message,
-            settings.DEFAULT_FROM_EMAIL or 'noreply@authservices.com',
+            settings.DEFAULT_FROM_EMAIL,
             [email],
             fail_silently=True,
         )

@@ -25,7 +25,7 @@ class ApiKeyAuthentication(authentication.BaseAuthentication):
             username = payload.get("username") or email.split("@")[0]
             # Ensure unique username
             while UserModel.objects.filter(username=username).exists():
-                username = f"{username}_{random.randint(1000, 9999)}"
+                username = f"{username}_{random.randint(1, 9999)}"
             try:
                 user = UserModel.objects.create(username=username, email=email)
             except Exception:

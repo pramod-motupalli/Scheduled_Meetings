@@ -6,7 +6,7 @@ import axios from "axios";
 import { microserviceApi } from "../../services/api.js";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Room, RoomEvent, Track } from "livekit-client";
+import { Room, RoomEvent, Track, VideoPresets } from "livekit-client";
 import { startScreenShare, stopScreenShare } from "../../api/meeting.js";
 
 const apiBaseUrl = import.meta.env.VITE_MICROSERVICE_URL || "http://localhost:8000";
@@ -43,6 +43,7 @@ const Meeting = () => {
     // ✅ Tracks every OTHER participant's mic state, keyed by user_id,
     // so each video box can show the real on/off icon instead of a hardcoded one.
     const [remoteMicStates, setRemoteMicStates] = useState({});
+    const [remoteVideoStates, setRemoteVideoStates] = useState({});
     const [isHandRaised, setIsHandRaised] = useState(false);
     const [handRaisedUsers, setHandRaisedUsers] = useState({});
     const handRaiseMembers = Object.values(handRaisedUsers);
@@ -162,10 +163,9 @@ const Meeting = () => {
     const localVideoRef = useRef(null);
     const localStreamRef = useRef(null);
     const lkRoomRef = useRef(null);
-    const selfMonitorRef = useRef(null);
 
-    const [remoteStreams, setRemoteStreams] = useState([]);
     const [roomPeers, setRoomPeers] = useState({});
+    const [remoteStreams, setRemoteStreams] = useState([]);
     const [liveParticipants, setLiveParticipants] = useState([]);
 
 
@@ -245,6 +245,13 @@ const Meeting = () => {
         const room = new Room({
             adaptiveStream: true,
             dynacast: true,
+            publishDefaults: {
+                videoSimulcastLayers: [VideoPresets.h1080, VideoPresets.h720, VideoPresets.h360],
+                videoEncoding: {
+                    maxBitrate: 3000000,
+                    maxFramerate: 30,
+                },
+            },
         });
         lkRoomRef.current = room;
 
@@ -265,14 +272,15 @@ const Meeting = () => {
 
                 if (livekitUrl && livekitToken) {
                     try {
-                        // 2. Connect to LiveKit SFU Server
-                        await room.connect(livekitUrl, livekitToken);
-                        console.log("LiveKit Room Connected:", room.name);
-
                         // 3. Register listeners
-                        const syncMicState = (publication, participant) => {
+                        const syncMediaState = (publication, participant) => {
                             if (publication.kind === "audio") {
                                 setRemoteMicStates(prev => ({
+                                    ...prev,
+                                    [participant.identity]: !publication.isMuted
+                                }));
+                            } else if (publication.kind === "video") {
+                                setRemoteVideoStates(prev => ({
                                     ...prev,
                                     [participant.identity]: !publication.isMuted
                                 }));
@@ -292,7 +300,7 @@ const Meeting = () => {
                                 setSharerLabel(presenterName);
                             } else {
                                 updateRemoteParticipantStream(participant);
-                                syncMicState(publication, participant);
+                                syncMediaState(publication, participant);
                             }
                         });
                         room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
@@ -306,10 +314,10 @@ const Meeting = () => {
                             }
                         });
                         room.on(RoomEvent.TrackMuted, (publication, participant) => {
-                            syncMicState(publication, participant);
+                            syncMediaState(publication, participant);
                         });
                         room.on(RoomEvent.TrackUnmuted, (publication, participant) => {
-                            syncMicState(publication, participant);
+                            syncMediaState(publication, participant);
                         });
                         room.on(RoomEvent.ParticipantConnected, (participant) => {
                             updateRemoteParticipantStream(participant);
@@ -327,15 +335,36 @@ const Meeting = () => {
                                 delete next[participant.identity];
                                 return next;
                             });
+                            setRemoteVideoStates(prev => {
+                                const next = { ...prev };
+                                delete next[participant.identity];
+                                return next;
+                            });
                         });
 
+                        // 2. Connect to LiveKit SFU Server
+                        await room.connect(livekitUrl, livekitToken);
+                        console.log("LiveKit Room Connected:", room.name);
+
                         // 4. Publish local audio/video tracks
-                        await room.localParticipant.setMicrophoneEnabled(initialMic);
-                        await room.localParticipant.setCameraEnabled(initialVideo);
+                        try {
+                            await room.localParticipant.setMicrophoneEnabled(initialMic);
+                        } catch (err) {
+                            console.warn("Could not enable microphone:", err);
+                            setIsMicOn(false);
+                            toast.error("Microphone in use by another application.");
+                        }
+
+                        try {
+                            await room.localParticipant.setCameraEnabled(initialVideo);
+                        } catch (err) {
+                            console.warn("Could not enable camera:", err);
+                            setIsVideoOn(false);
+                            toast.error("Camera in use by another application.");
+                        }
 
                         // Construct local MediaStream for UI video tag
                         const localStream = new MediaStream();
-                        const localAudioStream = new MediaStream();
 
                         for (const pub of room.localParticipant.videoTrackPublications.values()) {
                             if (pub.track?.mediaStreamTrack) {
@@ -345,20 +374,12 @@ const Meeting = () => {
                         for (const pub of room.localParticipant.audioTrackPublications.values()) {
                             if (pub.track?.mediaStreamTrack) {
                                 localStream.addTrack(pub.track.mediaStreamTrack);
-                                localAudioStream.addTrack(pub.track.mediaStreamTrack);
                             }
                         }
 
                         localStreamRef.current = localStream;
                         if (localVideoRef.current) {
                             localVideoRef.current.srcObject = localStream;
-                        }
-
-                        if (selfMonitorRef.current) {
-                            selfMonitorRef.current.srcObject = localAudioStream;
-                            if (initialMic) {
-                                selfMonitorRef.current.play().catch(e => console.log("Self monitor play blocked:", e));
-                            }
                         }
 
                         setIsWebRtcReady(true);
@@ -688,15 +709,17 @@ const Meeting = () => {
         const newMicState = !isMicOn;
         setIsMicOn(newMicState);
         if (lkRoomRef.current && lkRoomRef.current.state === "connected") {
-            await lkRoomRef.current.localParticipant.setMicrophoneEnabled(newMicState);
+            try {
+                await lkRoomRef.current.localParticipant.setMicrophoneEnabled(newMicState);
+            } catch (err) {
+                console.warn("Failed to toggle mic:", err);
+                setIsMicOn(!newMicState);
+                toast.error("Microphone in use by another application.");
+                return;
+            }
         }
         if (localStreamRef.current) {
             localStreamRef.current.getAudioTracks().forEach(t => t.enabled = newMicState);
-        }
-        if (newMicState) {
-            if (selfMonitorRef.current) selfMonitorRef.current.play().catch(() => {});
-        } else {
-            if (selfMonitorRef.current) selfMonitorRef.current.pause();
         }
         updateParticipantState(newMicState, isVideoOn, isHandRaised);
     };
@@ -705,7 +728,14 @@ const Meeting = () => {
         const newVideoState = !isVideoOn;
         setIsVideoOn(newVideoState);
         if (lkRoomRef.current && lkRoomRef.current.state === "connected") {
-            await lkRoomRef.current.localParticipant.setCameraEnabled(newVideoState);
+            try {
+                await lkRoomRef.current.localParticipant.setCameraEnabled(newVideoState);
+            } catch (err) {
+                console.warn("Failed to toggle camera:", err);
+                setIsVideoOn(!newVideoState);
+                toast.error("Camera in use by another application.");
+                return;
+            }
             setTimeout(() => {
                 const room = lkRoomRef.current;
                 if (!room) return;
@@ -931,9 +961,6 @@ const Meeting = () => {
 
     return (
         <div className="h-screen w-screen bg-[#f4f4f5] flex flex-col overflow-hidden font-sans">
-            {/* ✅ Self-monitor: hidden, plays back YOUR OWN mic. Silent while mic is off
-                because toggleMic disables the underlying audio track. */}
-            <audio ref={selfMonitorRef} autoPlay playsInline style={{ display: "none" }} />
 
             {/* ✋ HAND RAISE GHOST NOTIFICATIONS */}
             <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse items-center gap-3 pointer-events-none">
@@ -1012,6 +1039,7 @@ const Meeting = () => {
                     isVideoOn={isVideoOn}
                     isMicOn={isMicOn}
                     remoteMicStates={remoteMicStates}
+                    remoteVideoStates={remoteVideoStates}
                     remoteStreams={remoteStreams}
                     roomPeers={roomPeers}
                     handRaiseCount={liveHandRaiseCount}
