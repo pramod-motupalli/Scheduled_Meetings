@@ -147,6 +147,7 @@ if not CORS_ALLOWED_ORIGINS:
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',
     'http://localhost:3000',
+    'https://192.168.0.121:3000',
 ]
 
 # REST Framework settings

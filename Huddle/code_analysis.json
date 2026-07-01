@@ -1,0 +1,1176 @@
+{
+  ".": {
+    ".gitignore": {
+      "type": "other"
+    },
+    "docker-compose.yml": {
+      "type": "other"
+    },
+    "explore_script.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "analyze_python_file",
+        "analyze_js_file",
+        "explore_directory"
+      ]
+    },
+    "README.md": {
+      "type": "other"
+    }
+  },
+  "app1": {},
+  "app1\\backend1": {
+    ".env": {
+      "type": "other"
+    },
+    ".env.example": {
+      "type": "other"
+    },
+    "db.sqlite3": {
+      "type": "other"
+    },
+    "Dockerfile": {
+      "type": "other"
+    },
+    "manage.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    "requirements.txt": {
+      "type": "other"
+    }
+  },
+  "app1\\backend1\\authentication": {
+    "admin.py": {
+      "type": "python",
+      "classes": [
+        "CustomUserAdmin"
+      ],
+      "functions": []
+    },
+    "apps.py": {
+      "type": "python",
+      "classes": [
+        "AuthenticationConfig"
+      ],
+      "functions": []
+    },
+    "models.py": {
+      "type": "python",
+      "classes": [
+        "CustomUser"
+      ],
+      "functions": [
+        "__str__"
+      ]
+    },
+    "serializers.py": {
+      "type": "python",
+      "classes": [
+        "UserSerializer",
+        "RegisterSerializer",
+        "PasswordResetSerializer",
+        "PasswordResetConfirmSerializer",
+        "Meta",
+        "Meta"
+      ],
+      "functions": [
+        "validate_email",
+        "validate_username",
+        "create",
+        "validate_email",
+        "validate",
+        "save"
+      ]
+    },
+    "urls.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "views.py": {
+      "type": "python",
+      "classes": [
+        "LoginView",
+        "RegisterView",
+        "LogoutView",
+        "UserProfileView",
+        "UserListView",
+        "PasswordResetRequestView",
+        "PasswordResetConfirmView"
+      ],
+      "functions": [
+        "post",
+        "post",
+        "post",
+        "get_object",
+        "get",
+        "post",
+        "post"
+      ]
+    },
+    "__init__.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "app1\\backend1\\authentication\\migrations": {
+    "0001_initial.py": {
+      "type": "python",
+      "classes": [
+        "Migration"
+      ],
+      "functions": []
+    },
+    "0002_apikey.py": {
+      "type": "python",
+      "classes": [
+        "Migration"
+      ],
+      "functions": []
+    },
+    "0003_delete_apikey.py": {
+      "type": "python",
+      "classes": [
+        "Migration"
+      ],
+      "functions": []
+    },
+    "__init__.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "app1\\backend1\\config": {
+    "asgi.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "settings.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "urls.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "api_root"
+      ]
+    },
+    "wsgi.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "__init__.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "app1\\frontend1": {
+    ".dockerignore": {
+      "type": "other"
+    },
+    ".env": {
+      "type": "other"
+    },
+    ".env.example": {
+      "type": "other"
+    },
+    ".gitignore": {
+      "type": "other"
+    },
+    "components.json": {
+      "type": "other"
+    },
+    "Dockerfile": {
+      "type": "other"
+    },
+    "eslint.config.js": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": []
+    },
+    "git_files.txt": {
+      "type": "other"
+    },
+    "index.html": {
+      "type": "other"
+    },
+    "jsconfig.json": {
+      "type": "other"
+    },
+    "package-lock.json": {
+      "type": "other"
+    },
+    "package.json": {
+      "type": "other"
+    },
+    "README.md": {
+      "type": "other"
+    },
+    "vite.config.js": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "app1\\frontend1\\public": {
+    "bell.svg": {
+      "type": "other"
+    },
+    "Calendar.svg": {
+      "type": "other"
+    },
+    "download.png": {
+      "type": "other"
+    },
+    "favicon.svg": {
+      "type": "other"
+    },
+    "icons.svg": {
+      "type": "other"
+    },
+    "LayoutDashboard.svg": {
+      "type": "other"
+    },
+    "meeting_preview.png": {
+      "type": "other"
+    },
+    "Megaphone.svg": {
+      "type": "other"
+    },
+    "message.svg": {
+      "type": "other"
+    },
+    "MessageSquare.svg": {
+      "type": "other"
+    },
+    "mic-icon.svg": {
+      "type": "other"
+    },
+    "mon.svg": {
+      "type": "other"
+    },
+    "Monitor.svg": {
+      "type": "other"
+    },
+    "profile.svg": {
+      "type": "other"
+    },
+    "sign.svg": {
+      "type": "other"
+    },
+    "Zap.svg": {
+      "type": "other"
+    }
+  },
+  "app1\\frontend1\\src": {
+    "App.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "ProtectedRoute",
+        "DashboardUI",
+        "Messaging",
+        "Settings",
+        "isTokenExpired",
+        "NotFound",
+        "DashboardLayout",
+        "App",
+        "Profile"
+      ]
+    },
+    "index.css": {
+      "type": "other"
+    },
+    "main.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "app1\\frontend1\\src\\api": {
+    "meeting.js": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "stopScreenShare",
+        "getScreenSharer",
+        "startScreenShare"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\assets": {
+    "hero.png": {
+      "type": "other"
+    },
+    "placeholder.png": {
+      "type": "other"
+    },
+    "react.svg": {
+      "type": "other"
+    },
+    "vite.svg": {
+      "type": "other"
+    }
+  },
+  "app1\\frontend1\\src\\components": {},
+  "app1\\frontend1\\src\\components\\calender": {
+    "MiniCalender.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "nextMonth",
+        "isToday",
+        "getDaysInMonth",
+        "prevMonth",
+        "MiniCalendar",
+        "getFirstDayOfMonth"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\components\\chat": {
+    "AISummaryCard.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "AISummaryCard"
+      ]
+    },
+    "ChatList.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "ChatList"
+      ]
+    },
+    "ChatWindow.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "ChatWindow"
+      ]
+    },
+    "OutgoingCallModal.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "OutgoingCallModal"
+      ]
+    },
+    "TranscriptModal.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "TranscriptModal"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\components\\huddle": {
+    "CreateHuddle.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "handleJoinInstant",
+        "handleCopy",
+        "handleSendInvite",
+        "CreateHuddle",
+        "handleInstantMeeting"
+      ]
+    },
+    "HuddlePage.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "handleTabChange",
+        "handleCancelSession",
+        "parseMeetingIdentifier",
+        "handleDeleteSelected",
+        "handleToggleSelect",
+        "handleAddSession",
+        "HuddlePage",
+        "fetchDbMeetings",
+        "handleJoinSession"
+      ]
+    },
+    "ScheduledMeetings.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "buildFullLink",
+        "handleCopyLink",
+        "handleDeleteMeeting",
+        "fetchMeetings",
+        "handleRowClick",
+        "handleOpenMeeting",
+        "ScheduledMeetings"
+      ]
+    },
+    "SessionCard.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "handleTranscript",
+        "SessionCard"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\components\\layout": {
+    "Sidebar.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Sidebar"
+      ]
+    },
+    "TopBar.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "TopBar"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\components\\MeetingRoom": {
+    "AddParticipantModal.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "STORAGE_KEY",
+        "persistInvited",
+        "handleRemoveInvited",
+        "AddParticipantModal",
+        "handleInvite"
+      ]
+    },
+    "Footer.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Footer"
+      ]
+    },
+    "Header.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "updateClock",
+        "handleCopy",
+        "Header"
+      ]
+    },
+    "index.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "showHandRaiseGhost",
+        "connectRoom",
+        "toggleVideo",
+        "wsBaseUrl",
+        "toggleHandRaise",
+        "MeetingRoom",
+        "formatTime",
+        "connect",
+        "updateRemoteParticipantStream",
+        "toggleMic",
+        "syncMediaState",
+        "getInitials",
+        "updateParticipantState",
+        "fetchParticipantState"
+      ]
+    },
+    "Meeting.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "isMobileDevice",
+        "fetchToken",
+        "handleLeave",
+        "fetchAllParticipants",
+        "connect",
+        "fetchMeetingDetails",
+        "showHandRaiseGhost",
+        "syncMediaState",
+        "updateRemoteParticipantStream",
+        "toggleVideo",
+        "showScreenShareNotice",
+        "toggleHandRaise",
+        "handleKickParticipant",
+        "updateParticipantState",
+        "fetchParticipantState",
+        "handleSendMessage",
+        "toggleMic",
+        "stopSharing",
+        "handleScreenShare",
+        "handleEndMeeting",
+        "handleShareClick",
+        "connectRoom",
+        "wsBaseUrl",
+        "formatTime",
+        "Meeting"
+      ]
+    },
+    "ScreenShareModule.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "getSharerLabel",
+        "ScreenShareModule",
+        "ParticipantTile",
+        "InitialsAvatar"
+      ]
+    },
+    "Sidebar.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Sidebar",
+        "persistInvited",
+        "handleRemoveInvited",
+        "wsBaseUrl",
+        "connect",
+        "handleSendMessage",
+        "handleInvite",
+        "INVITE_STORAGE_KEY",
+        "loadChatHistory"
+      ]
+    },
+    "VideoStage.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "getParticipantTheme",
+        "getParticipantInitials",
+        "VideoStage",
+        "getRowSizes",
+        "getParticipantRows"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\components\\schedule": {
+    "AdvanceSchedule.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "fetchUsers",
+        "handleAddAttendee",
+        "AdvanceSchedule",
+        "handleRemoveAttendee",
+        "isTodaySelected",
+        "handleScheduleMeeting",
+        "toggleDay"
+      ]
+    },
+    "DaySelector.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "DaySelector"
+      ]
+    },
+    "MeetingTypeModal.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "createInstant",
+        "MeetingTypeModal"
+      ]
+    },
+    "ParticipantSelector.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "ParticipantSelector",
+        "addEmail"
+      ]
+    },
+    "RecurrencePicker.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "RecurrencePicker"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\components\\ui": {
+    "avatar.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "AvatarFallback",
+        "AvatarGroup",
+        "AvatarBadge",
+        "AvatarImage",
+        "Avatar",
+        "AvatarGroupCount"
+      ]
+    },
+    "badge.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Badge"
+      ]
+    },
+    "button.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Button"
+      ]
+    },
+    "calendar.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Calendar",
+        "CalendarDayButton"
+      ]
+    },
+    "card.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "CardFooter",
+        "CardAction",
+        "CardContent",
+        "CardTitle",
+        "Card",
+        "CardDescription",
+        "CardHeader"
+      ]
+    },
+    "dialog.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "DialogOverlay",
+        "DialogPortal",
+        "DialogTitle",
+        "DialogHeader",
+        "DialogContent",
+        "DialogFooter",
+        "DialogDescription",
+        "DialogTrigger",
+        "Dialog",
+        "DialogClose"
+      ]
+    },
+    "dropdown-menu.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "DropdownMenuItem",
+        "DropdownMenuSub",
+        "DropdownMenuSubContent",
+        "DropdownMenuGroup",
+        "DropdownMenuPortal",
+        "DropdownMenuCheckboxItem",
+        "DropdownMenuRadioGroup",
+        "DropdownMenu",
+        "DropdownMenuRadioItem",
+        "DropdownMenuLabel",
+        "DropdownMenuSeparator",
+        "DropdownMenuShortcut",
+        "DropdownMenuContent",
+        "DropdownMenuTrigger",
+        "DropdownMenuSubTrigger"
+      ]
+    },
+    "input.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Input"
+      ]
+    },
+    "popover.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "PopoverContent",
+        "PopoverTitle",
+        "PopoverDescription",
+        "PopoverAnchor",
+        "PopoverTrigger",
+        "PopoverHeader",
+        "Popover"
+      ]
+    },
+    "scroll-area.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "ScrollBar",
+        "ScrollArea"
+      ]
+    },
+    "select.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "SelectTrigger",
+        "SelectValue",
+        "SelectContent",
+        "SelectItem",
+        "SelectScrollDownButton",
+        "SelectSeparator",
+        "SelectLabel",
+        "SelectGroup",
+        "Select",
+        "SelectScrollUpButton"
+      ]
+    },
+    "separator.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "Separator"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\lib": {
+    "utils.js": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "cn"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\pages": {
+    "AuthReturn.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "AuthReturn"
+      ]
+    },
+    "LoginAuth.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "handleSubmit",
+        "LoginAuth"
+      ]
+    },
+    "MeetingLobby.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "toggleMedia",
+        "MeetingLobby",
+        "startMedia",
+        "handleJoin",
+        "validateMeeting"
+      ]
+    },
+    "SignupAuth.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "handleSubmit",
+        "SignupAuth"
+      ]
+    },
+    "ThankYou.jsx": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": [
+        "ThankYou",
+        "handleGoHome"
+      ]
+    }
+  },
+  "app1\\frontend1\\src\\services": {
+    "api.js": {
+      "type": "js/jsx",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "microservices": {
+    ".dockerignore": {
+      "type": "other"
+    },
+    ".env": {
+      "type": "other"
+    },
+    ".env.example": {
+      "type": "other"
+    },
+    ".gitignore": {
+      "type": "other"
+    },
+    "db.sqlite3": {
+      "type": "other"
+    },
+    "livekit.yaml": {
+      "type": "other"
+    },
+    "manage.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    "README.md": {
+      "type": "other"
+    },
+    "requirements.txt": {
+      "type": "other"
+    }
+  },
+  "microservices\\apps": {},
+  "microservices\\apps\\meetings": {
+    "admin.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "apps.py": {
+      "type": "python",
+      "classes": [
+        "MeetingsConfig"
+      ],
+      "functions": []
+    },
+    "auth_backends.py": {
+      "type": "python",
+      "classes": [
+        "EmailOrUsernameModelBackend"
+      ],
+      "functions": [
+        "authenticate"
+      ]
+    },
+    "consumers.py": {
+      "type": "python",
+      "classes": [
+        "ParticipantConsumer",
+        "ChatConsumer"
+      ],
+      "functions": [
+        "get_room",
+        "save_chat_message",
+        "connect",
+        "disconnect",
+        "receive_json",
+        "hand_raise_broadcast",
+        "presence_broadcast",
+        "broadcast_participants",
+        "participant_update",
+        "count_update",
+        "hand_count_broadcast",
+        "connect",
+        "disconnect",
+        "receive_json",
+        "chat_message"
+      ]
+    },
+    "livekit_utils.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "get_livekit_settings",
+        "generate_join_token",
+        "generate_admin_token",
+        "make_livekit_request",
+        "update_participant_permissions",
+        "mute_participant_track",
+        "kick_participant_from_room",
+        "delete_livekit_room"
+      ]
+    },
+    "MeetingViews.py": {
+      "type": "python",
+      "classes": [
+        "ValidateMeetingView",
+        "ScheduleMeetingView",
+        "ListMeetingsView",
+        "ParticipantStateView",
+        "UpdateParticipantStateView",
+        "LiveKitTokenView",
+        "LiveKitModerationView",
+        "LiveKitWebhookView",
+        "ChatMessageView",
+        "InviteParticipantView"
+      ],
+      "functions": [
+        "build_meeting_path",
+        "generate_meeting_code",
+        "get_meeting_by_identifier",
+        "get_user_by_identifier",
+        "get",
+        "post",
+        "get",
+        "delete",
+        "get",
+        "post",
+        "post",
+        "post",
+        "post",
+        "get",
+        "post",
+        "post"
+      ]
+    },
+    "models.py": {
+      "type": "python",
+      "classes": [
+        "Product",
+        "ProductApiKey",
+        "User",
+        "AuditLog",
+        "Meeting",
+        "MeetingParticipant",
+        "RecurrenceRule",
+        "MeetingSession",
+        "ParticipantSession",
+        "Recording",
+        "Transcript",
+        "ParticipantState",
+        "ChatMessage",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta"
+      ],
+      "functions": [
+        "__str__",
+        "__str__",
+        "__str__",
+        "__str__",
+        "__str__"
+      ]
+    },
+    "redis_service.py": {
+      "type": "python",
+      "classes": [
+        "ParticipantRedisService"
+      ],
+      "functions": [
+        "update_status",
+        "get_status"
+      ]
+    },
+    "routing.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "serializers.py": {
+      "type": "python",
+      "classes": [
+        "ParticipantStateSerializer",
+        "Meta"
+      ],
+      "functions": []
+    },
+    "services.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "join_meeting_session",
+        "leave_meeting_session",
+        "update_audio_state",
+        "add_participant_to_cache",
+        "remove_participant_from_cache",
+        "get_active_participants"
+      ]
+    },
+    "tests.py": {
+      "type": "python",
+      "classes": [
+        "LiveKitUnitTests",
+        "ScheduleMeetingTests"
+      ],
+      "functions": [
+        "setUp",
+        "test_token_generation_grants",
+        "test_token_generation_api",
+        "test_moderation_api_validation",
+        "test_bulk_delete_meetings",
+        "test_bulk_delete_meetings_query_params",
+        "setUp",
+        "test_schedule_meeting_with_explicit_api_key",
+        "test_schedule_meeting_fallback_api_key",
+        "test_build_meeting_path_deterministic"
+      ]
+    },
+    "urls.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "views.py": {
+      "type": "python",
+      "classes": [
+        "CustomLoginView",
+        "SignupView",
+        "SuperAdminDashboardView"
+      ],
+      "functions": [
+        "livekit_token",
+        "_state_key",
+        "_get_state",
+        "_save_state",
+        "toggle_mic",
+        "get_meeting_by_identifier",
+        "start_recording",
+        "stop_recording",
+        "start_screen_share",
+        "stop_screen_share",
+        "current_screen_sharer",
+        "get_participant",
+        "update_participant",
+        "get_all_participants",
+        "get_success_url",
+        "form_invalid",
+        "get_success_url",
+        "form_valid",
+        "form_invalid",
+        "get",
+        "post"
+      ]
+    },
+    "__init__.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "microservices\\apps\\meetings\\migrations": {
+    "0001_initial.py": {
+      "type": "python",
+      "classes": [
+        "Migration"
+      ],
+      "functions": []
+    },
+    "__init__.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "microservices\\backend": {
+    "asgi.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "authentication.py": {
+      "type": "python",
+      "classes": [
+        "ApiKeyAuthentication"
+      ],
+      "functions": [
+        "authenticate"
+      ]
+    },
+    "cache.py": {
+      "type": "python",
+      "classes": [
+        "FallbackRedisCache"
+      ],
+      "functions": [
+        "__init__",
+        "_call_with_fallback",
+        "add",
+        "get",
+        "set",
+        "touch",
+        "delete",
+        "get_many",
+        "set_many",
+        "delete_many",
+        "clear",
+        "has_key",
+        "incr",
+        "decr"
+      ]
+    },
+    "jwt_utils.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "base64url_encode",
+        "base64url_decode",
+        "encode_jwt",
+        "decode_jwt"
+      ]
+    },
+    "permissions.py": {
+      "type": "python",
+      "classes": [
+        "IsCompanyUser"
+      ],
+      "functions": [
+        "has_permission"
+      ]
+    },
+    "settings.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "urls.py": {
+      "type": "python",
+      "classes": [],
+      "functions": [
+        "home"
+      ]
+    },
+    "wsgi.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    },
+    "__init__.py": {
+      "type": "python",
+      "classes": [],
+      "functions": []
+    }
+  },
+  "microservices\\docker": {},
+  "microservices\\docker\\django": {
+    "Dockerfile": {
+      "type": "other"
+    }
+  },
+  "microservices\\templates": {},
+  "microservices\\templates\\auth": {
+    "login.html": {
+      "type": "other"
+    },
+    "signup.html": {
+      "type": "other"
+    }
+  },
+  "microservices\\templates\\super_admin": {
+    "dashboard.html": {
+      "type": "other"
+    }
+  }
+}

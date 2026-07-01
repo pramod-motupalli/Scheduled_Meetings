@@ -298,12 +298,12 @@ const [showSummary, setShowSummary] = useState(false);
 
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-col xl:flex-row w-full h-full overflow-y-auto xl:overflow-hidden bg-white">
       {/* Left Sidebar */}
       <ChatList />
 
       {/* Middle Section */}
-      <main className="flex flex-col flex-grow bg-white p-6 overflow-y-auto">
+      <main className="flex flex-col flex-grow bg-white p-4 sm:p-6 xl:overflow-y-auto shrink-0 xl:shrink">
         {/* Header */}
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Huddle</h1>
         <p className="text-gray-500 text-sm mb-5">
@@ -311,7 +311,7 @@ const [showSummary, setShowSummary] = useState(false);
         </p>
 
         {/* Meeting ID input */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
@@ -438,7 +438,7 @@ const [showSummary, setShowSummary] = useState(false);
       </main>
 
       {/* Right Sidebar */}
-      <aside className="w-full max-w-[480px] md:w-[480px] bg-gray-50 border-l border-gray-100 p-5 flex flex-col gap-5 overflow-y-auto flex-shrink-0 transition-all duration-300">
+      <aside className="w-full xl:w-[480px] xl:max-w-[480px] bg-gray-50 xl:border-l border-t xl:border-t-0 border-gray-100 p-4 sm:p-5 flex flex-col gap-5 xl:overflow-y-auto shrink-0 transition-all duration-300">
         <CreateHuddle onAddSession={handleAddSession} onCancelSession={handleCancelSession} />
         <MiniCalendar />
       </aside>

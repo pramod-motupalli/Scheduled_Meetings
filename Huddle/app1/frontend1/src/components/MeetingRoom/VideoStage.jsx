@@ -27,6 +27,8 @@ const VideoStage = ({
     remoteStreams = [],
     roomPeers = {},
     handRaiseCount = 0,
+    handRaisedUsers = {},
+    activeSpeakers = [],
     liveParticipants = [],
     userId,
 }) => {
@@ -41,6 +43,7 @@ const VideoStage = ({
         // Always add You first
         list.push({
             id: "local-user",
+            realUserId: userId,
             name: `${participantName} (You)`,
             isLocal: true,
             stream: null,
@@ -65,13 +68,16 @@ const VideoStage = ({
             seenIds.add(cleanId);
 
             const rStream = remoteStreams.find(
-                (r) => r.peerId === p.user_id || roomPeers[r.peerId]?.user_id === p.user_id,
+                (r) =>
+                    r.peerId === p.user_id ||
+                    roomPeers[r.peerId]?.user_id === p.user_id,
             );
             const cleanName = p.name
                 ? p.name.replace(/_[a-zA-Z0-9]{5}$/, "")
                 : "Remote User";
             list.push({
                 id: cleanId,
+                realUserId: cleanUserId,
                 name: cleanName,
                 isLocal: false,
                 stream: rStream ? rStream.stream : null,
@@ -187,8 +193,6 @@ const VideoStage = ({
             />
             {/* ================= MAIN GRID / STAGE ================= */}
             <div className="relative w-full h-full p-2 bg-[#f8fafc]">
-
-
                 <div className="relative w-full h-full overflow-hidden rounded-none">
                     <div className="w-full h-full px-4 py-2 flex flex-col gap-4">
                         {participantRows.map((row, rowIndex) => (
@@ -212,12 +216,13 @@ const VideoStage = ({
                                             : participantRows[0].length + index;
                                     const hasVideo = member.isLocal
                                         ? isVideoOn
-                                        : !!member.stream && member.videoOn !== false;
+                                        : !!member.stream &&
+                                          member.videoOn !== false;
 
                                     return (
                                         <div
                                             key={`${member.id}-${index}`}
-                                            className={`relative rounded-[24px] overflow-hidden border border-slate-200 bg-slate-50 shadow-sm ${
+                                            className={`relative rounded-[24px] overflow-hidden bg-slate-50 shadow-sm transition-all duration-300 ${activeSpeakers.includes(member.realUserId) ? 'ring-2 ring-blue-500 border-none scale-[1.02] z-10' : 'border border-slate-200'} ${
                                                 ((participantRows[0]?.length ===
                                                     2 &&
                                                     participantRows[1]
@@ -297,6 +302,12 @@ const VideoStage = ({
                                             {!member.micOn && (
                                                 <div className="absolute top-3 right-3 bg-red-500/90 text-white rounded-full p-2 z-20 shadow-sm">
                                                     <MicOff size={14} />
+                                                </div>
+                                            )}
+
+                                            {handRaisedUsers[member.realUserId] && (
+                                                <div className="absolute top-3 left-3 bg-gray-100 text-white rounded-full p-2 z-20 shadow-sm border border-amber-400">
+                                                    <span className="text-md">✋</span>
                                                 </div>
                                             )}
 

@@ -58,6 +58,85 @@ const Meeting = () => {
         { sender: "Rahul", text: "Can we start the demo?" },
         { sender: "Anika", text: "Sharing the screen now." },
     ]);
+    const [chatToasts, setChatToasts] = useState([]);
+
+    const [unreadChatCount, setUnreadChatCount] = useState(0);
+    const isChatOpenRef = useRef(false);
+    const [activeSpeakers, setActiveSpeakers] = useState([]);
+    const [localConnectionQuality, setLocalConnectionQuality] = useState(null);
+
+    useEffect(() => {
+        const isOpen = showMenuPage && activeMenu === "chat";
+        isChatOpenRef.current = isOpen;
+        if (isOpen) {
+            setUnreadChatCount(0);
+        }
+    }, [showMenuPage, activeMenu]);
+
+    const playBubbleSound = () => {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            // A quick downward frequency sweep creates a "bloop" or bubble sound
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.15);
+            
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        } catch (e) {
+            console.warn("AudioContext not supported or blocked", e);
+        }
+    };
+
+    const playHandRaiseSound = () => {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            // A pleasant ding (like a bell) for hand raise
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        } catch (e) {
+            console.warn("AudioContext not supported or blocked", e);
+        }
+    };
+
+    const handleNewChatMessage = (msg) => {
+        // Don't show toast for messages we sent ourselves
+        if (msg.user_id !== userId && msg.sender !== "You" && msg.sender !== displayName) {
+            playBubbleSound();
+            const id = Date.now().toString() + Math.random().toString();
+            setChatToasts((prev) => [...prev, { ...msg, id }]);
+            
+            if (!isChatOpenRef.current) {
+                setUnreadChatCount((prev) => prev + 1);
+            }
+            setTimeout(() => {
+                setChatToasts((prev) => prev.filter((t) => t.id !== id));
+            }, 5000);
+        }
+    };
 
     const navigate = useNavigate();
     const { company, letter, api_key, meeting_id } = useParams();
@@ -340,6 +419,14 @@ const Meeting = () => {
                                 delete next[participant.identity];
                                 return next;
                             });
+                        });
+                        room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
+                            setActiveSpeakers(speakers.map(s => s.identity));
+                        });
+                        room.on(RoomEvent.ConnectionQualityChanged, (quality, participant) => {
+                            if (participant === room.localParticipant) {
+                                setLocalConnectionQuality(quality);
+                            }
                         });
 
                         // 2. Connect to LiveKit SFU Server
@@ -755,6 +842,9 @@ const Meeting = () => {
     };
 
     const showHandRaiseGhost = (uid, name) => {
+        if (uid !== userId) {
+            playHandRaiseSound();
+        }
         const notifId = `${uid}-${Date.now()}`;
         setHandRaiseNotifications((prev) => [
             ...prev.filter((n) => n.uid !== uid),
@@ -959,6 +1049,30 @@ const Meeting = () => {
         setMessage("");
     };
 
+    const switchAudioDevice = async (deviceId) => {
+        if (lkRoomRef.current && lkRoomRef.current.state === "connected") {
+            try {
+                await lkRoomRef.current.switchActiveDevice("audioinput", deviceId);
+                toast.success("Audio device switched.");
+            } catch (err) {
+                console.error("Failed to switch audio device:", err);
+                toast.error("Failed to switch audio device.");
+            }
+        }
+    };
+
+    const switchVideoDevice = async (deviceId) => {
+        if (lkRoomRef.current && lkRoomRef.current.state === "connected") {
+            try {
+                await lkRoomRef.current.switchActiveDevice("videoinput", deviceId);
+                toast.success("Video device switched.");
+            } catch (err) {
+                console.error("Failed to switch video device:", err);
+                toast.error("Failed to switch video device.");
+            }
+        }
+    };
+
     return (
         <div className="h-screen w-screen bg-[#f4f4f5] flex flex-col overflow-hidden font-sans">
 
@@ -1022,9 +1136,26 @@ const Meeting = () => {
                 setShowMenuPage={setShowMenuPage}
                 handRaiseCount={liveHandRaiseCount}
                 activeParticipantsCount={liveParticipants.length}
+                localConnectionQuality={localConnectionQuality}
             />
 
             <main className="flex-1 flex min-h-0 overflow-hidden relative bg-[#f8fafc]">
+                
+                {/* 💬 FLOATING CHAT TOASTS */}
+                <div className="absolute bottom-6 left-6 z-40 flex flex-col gap-3 pointer-events-none">
+                    {chatToasts.map(toast => (
+                        <div key={toast.id} className="bg-slate-900/95 backdrop-blur-xl shadow-2xl border border-slate-700 rounded-2xl p-4 min-w-[250px] max-w-sm animate-slide-up pointer-events-auto transition-all">
+                            <div className="flex items-center gap-2 mb-1.5">
+                                <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-[9px] font-bold text-white uppercase">
+                                    {toast.sender.substring(0, 2)}
+                                </div>
+                                <p className="text-[11px] font-bold text-blue-400">{toast.sender}</p>
+                            </div>
+                            <p className="text-sm text-white/95 leading-relaxed">{toast.text}</p>
+                        </div>
+                    ))}
+                </div>
+
                 <VideoStage
                     showParticipantsGrid={showParticipantsGrid}
                     setShowParticipantsGrid={setShowParticipantsGrid}
@@ -1043,6 +1174,8 @@ const Meeting = () => {
                     remoteStreams={remoteStreams}
                     roomPeers={roomPeers}
                     handRaiseCount={liveHandRaiseCount}
+                    handRaisedUsers={handRaisedUsers}
+                    activeSpeakers={activeSpeakers}
                     liveParticipants={liveParticipants}
                     userId={userId}
                 />
@@ -1064,6 +1197,9 @@ const Meeting = () => {
                     meetingId={meetingId}
                     userId={userId}
                     participantName={participantName}
+                    activeMenu={activeMenu}
+                    setActiveMenu={setActiveMenu}
+                    onNewChatMessage={handleNewChatMessage}
                 />
 
                 <ScreenShareModule
@@ -1101,6 +1237,11 @@ const Meeting = () => {
                 handleEndMeeting={handleEndMeeting}
                 handleLeave={handleLeave}
                 liveParticipants={liveParticipants}
+                switchAudioDevice={switchAudioDevice}
+                switchVideoDevice={switchVideoDevice}
+                activeMenu={activeMenu}
+                setActiveMenu={setActiveMenu}
+                unreadChatCount={unreadChatCount}
             />
 
 

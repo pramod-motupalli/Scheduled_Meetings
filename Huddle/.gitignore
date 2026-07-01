@@ -34,3 +34,4 @@ db.sqlite3
 venv/
 env/
 .venv/
+explore_script.py

@@ -18,7 +18,7 @@ export default function ChatList() {
   const [chatSearch, setChatSearch] = useState("");
 
   return (
-    <div className="w-full max-w-[324px] md:w-[324px] h-[824px] flex flex-col bg-white border border-gray-100 rounded-[12px] overflow-y-auto flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.01)] transition-all duration-300">
+    <div className="hidden xl:flex flex-col w-full xl:w-[324px] xl:max-w-[324px] xl:h-full bg-white border border-gray-100 rounded-[12px] overflow-y-auto flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.01)] transition-all duration-300">
       
       {/* Announcements */}
       <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100/80 cursor-pointer border-b border-gray-100/60 rounded-[8px] w-full h-[48px] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm mb-1">
