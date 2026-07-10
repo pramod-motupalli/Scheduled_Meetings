@@ -66,7 +66,7 @@ export const ScreenShareModule = ({
     if (!isScreenSharing) return null;
 
     return (
-        <div className="absolute inset-0 bg-[#0e0e10] flex flex-col">
+        <div className="absolute inset-0 bg-[#0e0e10] flex flex-col z-[100]">
             <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-5 pt-4 pointer-events-none">
                 <div className="flex items-center gap-2 bg-black/70 backdrop-blur-md text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg">
                     <Monitor size={15} className="text-green-400" />
@@ -85,22 +85,30 @@ export const ScreenShareModule = ({
             </div>
 
             <div className="absolute inset-0 flex items-center justify-center pt-14 pb-[118px] px-4">
-                <video
-                    autoPlay
-                    playsInline
-                    muted={isLocalScreenSharing}
-                    ref={(el) => {
-                        if (el) {
-                            if (el.srcObject !== screenStream) {
-                                el.srcObject = screenStream;
-                                if (screenStream) {
-                                    el.play().catch((err) => console.warn("Failed to play screen share stream:", err));
+                {isLocalScreenSharing ? (
+                    <div className="flex flex-col items-center justify-center w-full h-full bg-[#1e1f26] rounded-xl border border-white/10">
+                        <Monitor size={64} className="text-indigo-400 mb-6" />
+                        <h2 className="text-2xl font-bold text-white mb-2">You are presenting to everyone</h2>
+                        <p className="text-slate-400">Your screen is visible to other participants in the meeting.</p>
+                    </div>
+                ) : (
+                    <video
+                        autoPlay
+                        playsInline
+                        muted={isLocalScreenSharing}
+                        ref={(el) => {
+                            if (el) {
+                                if (el.srcObject !== screenStream) {
+                                    el.srcObject = screenStream;
+                                    if (screenStream) {
+                                        el.play().catch((err) => console.warn("Failed to play screen share stream:", err));
+                                    }
                                 }
                             }
-                        }
-                    }}
-                    className="w-full h-full object-contain rounded-xl bg-black"
-                />
+                        }}
+                        className="w-full h-full object-contain rounded-xl bg-black"
+                    />
+                )}
             </div>
 
             <div

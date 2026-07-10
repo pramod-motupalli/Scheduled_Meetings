@@ -12,7 +12,7 @@ const wsBaseUrl = (() => {
     return `${proto}//${window.location.host}`;
 })();
 
-const apiBaseUrl = import.meta.env.VITE_MICROSERVICE_URL || "http://localhost:8000";
+const apiBaseUrl = import.meta.env.VITE_MICROSERVICE_URL || "";
 const API_URL = `${apiBaseUrl}/api/meetings`;
 
 // Subcomponents
@@ -461,10 +461,8 @@ const MeetingRoom = () => {
 
     const updateParticipantState = async (mic, video, hand) => {
         try {
-            const apiKey = import.meta.env.VITE_X_API_KEY || sessionStorage.getItem("api_key") || localStorage.getItem("api_key") || "";
-            console.log("meetingId =", meetingId);
-            await axios.post(
-                `${API_URL}/participant/update/`,
+            await microserviceApi.post(
+                `/api/meetings/participant/update/`,
                 {
                     user_id: userId,
                     meeting_id: meetingId,
@@ -472,12 +470,7 @@ const MeetingRoom = () => {
                     mic_on: mic,
                     video_on: video,
                     hand_raised: hand,
-                },
-                {
-                    headers: {
-                        "X-API-Key": apiKey,
-                    },
-                },
+                }
             );
             console.log("Database State Updated successfully.");
         } catch (error) {

@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 import { Room, RoomEvent, Track, VideoPresets } from "livekit-client";
 import { startScreenShare, stopScreenShare } from "../../api/meeting.js";
 
-const apiBaseUrl = import.meta.env.VITE_MICROSERVICE_URL || "http://localhost:8000";
+const apiBaseUrl = import.meta.env.VITE_MICROSERVICE_URL || "";
 // Derive WebSocket base URL from the current browser host so it works everywhere:
 // localhost dev, ngrok tunnels, LAN IPs — no env var needed.
 const wsBaseUrl = (() => {
@@ -33,6 +33,20 @@ const Meeting = () => {
     const [showMenuPage, setShowMenuPage] = useState(false);
     const [activeMenu, setActiveMenu] = useState("assistance");
     const [transcriptionEnabled, setTranscriptionEnabled] = useState(true);
+
+    const [floatingReactions, setFloatingReactions] = useState([]);
+    const [activeReactions, setActiveReactions] = useState({});
+
+    const showReactionOnVideoCard = (id, emoji) => {
+        setActiveReactions(prev => ({ ...prev, [id]: emoji }));
+        setTimeout(() => {
+            setActiveReactions(prev => {
+                const next = { ...prev };
+                if (next[id] === emoji) delete next[id];
+                return next;
+            });
+        }, 3000);
+    };
 
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -207,7 +221,8 @@ const Meeting = () => {
                 });
                 if (tokenResponse.data) {
                     setLivekitToken(tokenResponse.data.token || "");
-                    setLivekitUrl(tokenResponse.data.url || "");
+                    const envUrl = import.meta.env.VITE_LIVEKIT_URL;
+                    setLivekitUrl(envUrl || tokenResponse.data.url || "");
                     const returnedRole = tokenResponse.data.role;
                     if (returnedRole) {
                         setUserRole(returnedRole);
@@ -317,6 +332,62 @@ const Meeting = () => {
     };
 
     // LiveKit SFU setup and event routing
+    const handleReaction = (emoji) => {
+        if (!lkRoomRef.current) return;
+        const payload = JSON.stringify({ type: "reaction", emoji, sender: participantName });
+        const encoded = new TextEncoder().encode(payload);
+        lkRoomRef.current.localParticipant.publishData(encoded, { reliable: true });
+        
+        // Add locally
+        addFloatingReaction(emoji, participantName);
+        showReactionOnVideoCard(userId, emoji);
+    };
+
+    const addFloatingReaction = (emoji, senderName) => {
+        // Generate raindrops/particles for the effect
+        const numDrops = Math.floor(Math.random() * 20) + 40;
+        const drops = Array.from({ length: numDrops }).map((_, i) => {
+            let animClass = 'animate-emoji-float';
+            let extraStyle = {};
+
+            if (emoji === '😂') {
+                animClass = Math.random() > 0.5 ? 'animate-laugh-left' : 'animate-laugh-right';
+            } else if (emoji === '❤️') {
+                animClass = 'animate-heart-float';
+            } else if (emoji === '🎉') {
+                animClass = 'animate-party-explode';
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 40 + Math.random() * 60; // vh/vw
+                extraStyle['--party-x'] = `${Math.cos(angle) * distance}vw`;
+                extraStyle['--party-y'] = `${Math.sin(angle) * distance - 80}vh`; // bias upwards strongly
+                extraStyle['--party-rot'] = `${Math.random() * 720 - 360}deg`;
+            } else if (emoji === '👏') {
+                animClass = 'animate-emoji-sway';
+            } else {
+                // thumbs up/down, etc.
+                animClass = 'animate-emoji-sway'; 
+            }
+
+            return {
+                id: Date.now() + Math.random() + i,
+                emoji,
+                left: Math.random() * 100, // random left position 0-100%
+                duration: 2 + Math.random() * 2.5, // 2s to 4.5s
+                delay: Math.random() * 0.5, // 0 to 0.5s delay
+                size: 20 + Math.random() * 35, // 20px to 55px
+                animClass,
+                extraStyle
+            };
+        });
+        
+        setFloatingReactions(prev => [...prev, ...drops]);
+        
+        // Remove after the longest animation completes
+        setTimeout(() => {
+            setFloatingReactions(prev => prev.filter(r => !drops.some(d => d.id === r.id)));
+        }, 5000);
+    };
+
     useEffect(() => {
         if (!isTokenLoaded) return;
 
@@ -427,6 +498,18 @@ const Meeting = () => {
                             if (participant === room.localParticipant) {
                                 setLocalConnectionQuality(quality);
                             }
+                        });
+                        room.on(RoomEvent.DataReceived, (payload, participant) => {
+                            try {
+                                const strData = new TextDecoder().decode(payload);
+                                const data = JSON.parse(strData);
+                                if (data.type === "reaction") {
+                                    addFloatingReaction(data.emoji, participant?.name || data.sender);
+                                    if (participant) {
+                                        showReactionOnVideoCard(participant.identity, data.emoji);
+                                    }
+                                }
+                            } catch (e) {}
                         });
 
                         // 2. Connect to LiveKit SFU Server
@@ -1141,6 +1224,8 @@ const Meeting = () => {
 
             <main className="flex-1 flex min-h-0 overflow-hidden relative bg-[#f8fafc]">
                 
+
+
                 {/* 💬 FLOATING CHAT TOASTS */}
                 <div className="absolute bottom-6 left-6 z-40 flex flex-col gap-3 pointer-events-none">
                     {chatToasts.map(toast => (
@@ -1178,6 +1263,7 @@ const Meeting = () => {
                     activeSpeakers={activeSpeakers}
                     liveParticipants={liveParticipants}
                     userId={userId}
+                    activeReactions={activeReactions}
                 />
 
                 <Sidebar
@@ -1213,6 +1299,25 @@ const Meeting = () => {
                     stopSharing={stopSharing}
                     liveParticipants={liveParticipants}
                 />
+
+                {/* EMOJI RAIN OVERLAY */}
+                <div className="absolute inset-0 pointer-events-none z-[9999] overflow-hidden">
+                    {floatingReactions.map(r => (
+                        <div 
+                            key={r.id} 
+                            className={`absolute top-[100%] ${r.animClass || 'animate-emoji-float'} drop-shadow-lg`}
+                            style={{
+                                left: `${r.left}%`,
+                                fontSize: `${r.size}px`,
+                                animationDuration: `${r.duration}s`,
+                                animationDelay: `${r.delay}s`,
+                                ...r.extraStyle
+                            }}
+                        >
+                            {r.emoji}
+                        </div>
+                    ))}
+                </div>
             </main>
             <Footer
                 isSidebarOpen={showHandRaise || showParticipants || showMenuPage || showAddParticipant}
@@ -1242,6 +1347,7 @@ const Meeting = () => {
                 activeMenu={activeMenu}
                 setActiveMenu={setActiveMenu}
                 unreadChatCount={unreadChatCount}
+                onReaction={handleReaction}
             />
 
 

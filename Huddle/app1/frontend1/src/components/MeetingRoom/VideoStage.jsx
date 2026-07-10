@@ -31,6 +31,7 @@ const VideoStage = ({
     activeSpeakers = [],
     liveParticipants = [],
     userId,
+    activeReactions = {},
 }) => {
     // ==========================================
     // 1. LIVE SYNCHRONIZED PARTICIPANTS
@@ -109,7 +110,15 @@ const VideoStage = ({
     // 2. PAGINATION & ROW LOGIC
     // ==========================================
     const [currentPage, setCurrentPage] = useState(0);
-    const PAGE_SIZE = 9;
+    // Track mobile view
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const PAGE_SIZE = isMobile ? 2 : 9;
 
     const totalPages = Math.max(
         1,
@@ -118,7 +127,11 @@ const VideoStage = ({
     const clampedPage = Math.max(0, Math.min(currentPage, totalPages - 1));
     const startIndex = clampedPage * PAGE_SIZE;
     const endIndex = startIndex + PAGE_SIZE;
-    const pagedParticipants = activeParticipants.slice(startIndex, endIndex);
+    const [pagedParticipants, setPagedParticipants] = useState([]);
+
+    useEffect(() => {
+        setPagedParticipants(activeParticipants.slice(startIndex, endIndex));
+    }, [activeParticipants, startIndex, endIndex]);
 
     const canGoLeft = clampedPage > 0;
     const canGoRight = clampedPage < totalPages - 1;
@@ -151,11 +164,29 @@ const VideoStage = ({
 
     const getRowSizes = (count) => {
         if (count <= 0) return [];
-        if (count <= 4) return [count];
+        
+        if (isMobile) {
+            if (count === 1) return [1];
+            if (count === 2) return [1, 1]; // 2 rows of 1
+            if (count === 3) return [1, 2]; // 1 row of 1, 1 row of 2
+            if (count === 4) return [2, 2];
+            if (count === 5) return [2, 3]; // 2 top, 3 bottom (small on mobile, but acceptable)
+            if (count === 6) return [2, 2, 2]; // 3 rows of 2
+            if (count === 7) return [2, 2, 3];
+            if (count === 8) return [2, 2, 2, 2];
+            if (count >= 9) return [2, 2, 2, 2]; // Paginated anyway
+        }
+
+        // Desktop
+        if (count === 1) return [1];
+        if (count === 2) return [2];
+        if (count === 3) return [3];
+        if (count === 4) return [2, 2];
         if (count === 5) return [2, 3];
         if (count === 6) return [3, 3];
         if (count === 7) return [3, 4];
         if (count === 8) return [4, 4];
+        if (count === 9) return [3, 3, 3];
         return [4, 5];
     };
 
@@ -198,16 +229,11 @@ const VideoStage = ({
                         {participantRows.map((row, rowIndex) => (
                             <div
                                 key={rowIndex}
-                                className={`flex gap-4 flex-1 ${
-                                    ((participantRows[0]?.length === 2 &&
-                                        participantRows[1]?.length === 3) ||
-                                        (participantRows[0]?.length === 3 &&
-                                            participantRows[1]?.length ===
-                                                4)) &&
-                                    rowIndex === 0
-                                        ? "justify-center"
-                                        : ""
-                                }`}
+                                className={`flex gap-2 sm:gap-4 flex-1 ${
+                                            participantRows[0]?.length < participantRows[1]?.length && rowIndex === 0
+                                                ? "justify-center"
+                                                : ""
+                                        }`}
                             >
                                 {row.map((member, index) => {
                                     const globalIndex =
@@ -222,34 +248,11 @@ const VideoStage = ({
                                     return (
                                         <div
                                             key={`${member.id}-${index}`}
-                                            className={`relative rounded-[24px] overflow-hidden bg-slate-50 shadow-sm transition-all duration-300 ${activeSpeakers.includes(member.realUserId) ? 'ring-2 ring-blue-500 border-none scale-[1.02] z-10' : 'border border-slate-200'} ${
-                                                ((participantRows[0]?.length ===
-                                                    2 &&
-                                                    participantRows[1]
-                                                        ?.length === 3) ||
-                                                    (participantRows[0]
-                                                        ?.length === 3 &&
-                                                        participantRows[1]
-                                                            ?.length === 4)) &&
-                                                rowIndex === 0
-                                                    ? ""
-                                                    : "flex-1"
+                                            className={`relative rounded-[24px] overflow-hidden bg-slate-50 shadow-sm transition-all duration-300 flex-1 ${
+                                                activeSpeakers.includes(member.realUserId) 
+                                                    ? 'ring-2 ring-blue-500 border-none scale-[1.02] z-10' 
+                                                    : 'border border-slate-200'
                                             }`}
-                                            style={
-                                                participantRows[0]?.length ===
-                                                    2 &&
-                                                participantRows[1]?.length ===
-                                                    3 &&
-                                                rowIndex === 0
-                                                    ? { flex: "0 0 30%" }
-                                                    : participantRows[0]
-                                                            ?.length === 3 &&
-                                                        participantRows[1]
-                                                            ?.length === 4 &&
-                                                        rowIndex === 0
-                                                      ? { flex: "0 0 23%" }
-                                                      : {}
-                                            }
                                         >
                                             {/* INJECT LIVE VIDEO OR GRADIENT INITIALS */}
                                             {hasVideo ? (
@@ -311,6 +314,12 @@ const VideoStage = ({
                                                 </div>
                                             )}
 
+                                            {activeReactions[member.realUserId] && (
+                                                <div className="absolute inset-0 z-[100] pointer-events-none flex justify-center w-full h-full">
+                                                    <span className="text-6xl drop-shadow-2xl animate-emoji-float absolute top-[-10vh]">{activeReactions[member.realUserId]}</span>
+                                                </div>
+                                            )}
+
                                             <div className="absolute bottom-3 left-3 z-20">
                                                 <div className="bg-slate-900/60 backdrop-blur-sm px-3 py-1 rounded-lg">
                                                     <p className="text-white text-xs font-semibold">
@@ -333,7 +342,7 @@ const VideoStage = ({
                                     canGoLeft &&
                                     setCurrentPage((p) => Math.max(0, p - 1))
                                 }
-                                className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${canGoLeft ? "bg-black text-white border-black hover:scale-105" : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"}`}
+                                className={`absolute left-1 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${canGoLeft ? "bg-black text-white border-black hover:scale-105" : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"}`}
                                 disabled={!canGoLeft}
                             >
                                 <ChevronLeft size={22} />
@@ -345,7 +354,7 @@ const VideoStage = ({
                                         Math.min(totalPages - 1, p + 1),
                                     )
                                 }
-                                className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${canGoRight ? "bg-black text-white border-black hover:scale-105" : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"}`}
+                                className={`absolute right-1 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${canGoRight ? "bg-black text-white border-black hover:scale-105" : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"}`}
                                 disabled={!canGoRight}
                             >
                                 <ChevronRight size={22} />

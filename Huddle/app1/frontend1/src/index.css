@@ -138,6 +138,59 @@ input, textarea, select, [contenteditable="true"], .selectable, [select-all] {
   animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes emoji-float-down {
+  0% { transform: translateY(0) rotate(-15deg); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(120vh) rotate(15deg); opacity: 0; }
+}
+.animate-emoji-float {
+  animation: emoji-float-down 2.5s linear forwards;
+}
+
+@keyframes emoji-heart-float {
+  0% { transform: translateY(-110vh) scale(0.8); opacity: 1; }
+  50% { transform: translateY(-50vh) scale(1.3); }
+  100% { transform: translateY(10vh) scale(1); opacity: 0; }
+}
+.animate-heart-float {
+  animation: emoji-heart-float linear forwards;
+}
+
+@keyframes emoji-laugh-left {
+  0% { transform: translate(-30vw, 10vh) rotate(-30deg) scale(0.5); opacity: 1; }
+  100% { transform: translate(30vw, -120vh) rotate(30deg) scale(1.5); opacity: 0; }
+}
+.animate-laugh-left {
+  animation: emoji-laugh-left ease-out forwards;
+}
+
+@keyframes emoji-laugh-right {
+  0% { transform: translate(30vw, 10vh) rotate(30deg) scale(0.5); opacity: 1; }
+  100% { transform: translate(-30vw, -120vh) rotate(-30deg) scale(1.5); opacity: 0; }
+}
+.animate-laugh-right {
+  animation: emoji-laugh-right ease-out forwards;
+}
+
+@keyframes emoji-party-explode {
+  0% { transform: translateY(10vh) scale(0.1); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(var(--party-y)) translateX(var(--party-x)) rotate(var(--party-rot)); opacity: 0; }
+}
+.animate-party-explode {
+  animation: emoji-party-explode cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes emoji-sway {
+  0% { transform: translateY(10vh) translateX(0); opacity: 1; }
+  30% { transform: translateY(-40vh) translateX(3vw) rotate(10deg); }
+  60% { transform: translateY(-80vh) translateX(-3vw) rotate(-10deg); }
+  100% { transform: translateY(-120vh) translateX(0); opacity: 0; }
+}
+.animate-emoji-sway {
+  animation: emoji-sway linear forwards;
+}
+
 /* Hand Raise Ghost Notification Animation */
 @keyframes handRaiseIn {
   0% {

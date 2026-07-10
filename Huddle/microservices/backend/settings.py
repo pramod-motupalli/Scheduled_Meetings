@@ -4,7 +4,14 @@ from dotenv import load_dotenv
 # pyrefly: ignore [missing-import]
 from decouple import config
 
-load_dotenv()
+env = os.getenv('DJANGO_ENV', 'local')
+if env == 'production':
+    load_dotenv('.env.production', override=True)
+else:
+    load_dotenv('.env.local', override=True)
+
+# Always load .env as fallback
+load_dotenv('.env', override=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -69,28 +76,37 @@ ASGI_APPLICATION = 'backend.asgi.application'
 
 import urllib.parse as urlparse
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-database_url = os.getenv("DATABASE_URL")
-if not database_url:
-    raise ValueError("DATABASE_URL environment variable is required. Supabase connection must be configured.")
+# Database configuration
+if env == 'production':
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable is required for production.")
+    
+    url = urlparse.urlparse(database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path[1:],
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': url.port or 5432,
+        }
+    }
+    query = urlparse.parse_qs(url.query)
+    if 'sslmode' in query:
+        DATABASES['default']['OPTIONS'] = {
+            'sslmode': query['sslmode'][0]
+        }
+else:
+    # --- SQLite (local dev) ---
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-url = urlparse.urlparse(database_url)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': url.path[1:],
-        'USER': url.username,
-        'PASSWORD':url.password,
-        'HOST': url.hostname,
-        'PORT': url.port or 5432,
-    }
-}
-query = urlparse.parse_qs(url.query)
-if 'sslmode' in query:
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': query['sslmode'][0]
-    }
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
@@ -142,12 +158,13 @@ if not CORS_ALLOWED_ORIGINS:
     CORS_ALLOWED_ORIGINS = [
         "http://localhost:3000",
         "http://localhost:5173",
+        'https://192.168.0.123:3000',
     ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',
     'http://localhost:3000',
-    'https://192.168.0.121:3000',
+    'https://192.168.0.123:3000',
 ]
 
 # REST Framework settings
@@ -165,7 +182,10 @@ REST_FRAMEWORK = {
 
 
 # Realtime Channels & Cache (Strictly Redis / Memurai)
-redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
+if os.getenv("DOCKER_ENV"):
+    redis_url = "redis://redis-cache:6379/0"
+else:
+    redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
 
 CACHES = {
     "default": {
@@ -236,5 +256,13 @@ AUTHENTICATION_BACKENDS = [
 LIVEKIT_URL = os.getenv("LIVEKIT_URL", "http://localhost:7880")
 LIVEKIT_API_KEY = os.getenv("LIVEKIT_API_KEY", "devkey")
 LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET", "secret")
+
+# Django REST Framework — enforce API key on all endpoints globally
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'apps.meetings.permissions.HasAPIKey',
+    ]
+}
+
 
 

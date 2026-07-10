@@ -7,12 +7,13 @@ import {
     CheckCircle2,
     Loader2,
     UserPlus,
+    Save,
 } from "lucide-react";
 import { microserviceApi } from "../../services/api";
 import toast from "react-hot-toast";
 
 const apiBaseUrl =
-    import.meta.env.VITE_MICROSERVICE_URL || "http://localhost:8000";
+    import.meta.env.VITE_MICROSERVICE_URL || "";
 
 // Derive WebSocket base URL from the browser host — same approach as MeetingRoom/index.jsx.
 // This ensures the WS connection goes through the Vite proxy (/ws → :8000) and works
@@ -49,6 +50,26 @@ const Sidebar = ({
     const [chatMessages, setChatMessages] = useState([]);
     const [showAll, setShowAll] = useState(false);
     const chatBottomRef = useRef(null);
+
+    // Notes State
+    const [notesText, setNotesText] = useState("");
+
+    const handleSaveNotes = () => {
+        if (!notesText.trim()) {
+            toast.error("Notes are empty!");
+            return;
+        }
+        const blob = new Blob([notesText], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Meeting_Notes_${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success("Notes saved successfully!");
+    };
 
     // ── Add Participants panel state ──────────────────────────────────────────
     const [inviteEmail, setInviteEmail] = useState("");
@@ -108,18 +129,11 @@ const Sidebar = ({
 
         setInviteLoading(true);
         try {
-            const apiKey =
-                import.meta.env.VITE_X_API_KEY ||
-                sessionStorage.getItem("api_key") ||
-                localStorage.getItem("api_key") ||
-                "";
-
             await Promise.all(
                 newEmails.map((singleEmail) =>
                     microserviceApi.post(
                         "/api/meeting/invite/",
                         { meeting_id: meetingId, email: singleEmail },
-                        { headers: { "X-Api-Key": apiKey } },
                     ),
                 ),
             );
@@ -528,10 +542,21 @@ const Sidebar = ({
                             </div>
                         )}
                         {activeMenu === "notes" && (
-                            <textarea
-                                placeholder="Write meeting notes..."
-                                className="w-full h-full border border-slate-200 rounded-2xl p-4 outline-none resize-none"
-                            ></textarea>
+                            <div className="flex flex-col h-full gap-3">
+                                <textarea
+                                    value={notesText}
+                                    onChange={(e) => setNotesText(e.target.value)}
+                                    placeholder="Write meeting notes..."
+                                    className="flex-1 border border-slate-200 rounded-2xl p-4 outline-none resize-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100/50 transition-all text-sm text-slate-700"
+                                ></textarea>
+                                <button
+                                    onClick={handleSaveNotes}
+                                    className="w-full py-2.5 rounded-xl bg-[#0f2a78] hover:bg-[#0c2263] text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-lg transition-all"
+                                >
+                                    <Save size={16} />
+                                    Save as .txt
+                                </button>
+                            </div>
                         )}
                         {activeMenu === "assistance" && (
                             <div className="flex flex-col gap-4">

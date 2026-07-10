@@ -1,0 +1,8 @@
+version: "2"
+tunnels:
+  frontend:
+    addr: app1:3000
+    proto: http
+  livekit:
+    addr: livekit:7880
+    proto: http

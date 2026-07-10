@@ -56,18 +56,11 @@ export default function AddParticipantModal({ open, setOpen, meetingId }) {
 
         setLoading(true);
         try {
-            const apiKey =
-                import.meta.env.VITE_X_API_KEY ||
-                sessionStorage.getItem("api_key") ||
-                localStorage.getItem("api_key") ||
-                "";
-
             await Promise.all(
                 newEmails.map((singleEmail) =>
                     microserviceApi.post(
                         "/api/meeting/invite/",
-                        { meeting_id: meetingId, email: singleEmail },
-                        { headers: { "X-Api-Key": apiKey } }
+                        { meeting_id: meetingId, email: singleEmail }
                     )
                 )
             );

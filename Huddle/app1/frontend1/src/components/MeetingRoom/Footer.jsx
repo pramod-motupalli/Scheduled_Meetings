@@ -15,6 +15,7 @@ import {
     PhoneOff,
     UserMinus,
     Check,
+    Smile,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { toast } from "react-hot-toast";
@@ -48,9 +49,11 @@ const Footer = ({
     activeMenu,
     setActiveMenu,
     unreadChatCount = 0,
+    onReaction,
 }) => {
     const [isKickDialogOpen, setIsKickDialogOpen] = React.useState(false);
     const [isHostControlsOpen, setIsHostControlsOpen] = React.useState(false);
+    const [showReactionMenu, setShowReactionMenu] = React.useState(false);
 
     const [audioDevices, setAudioDevices] = React.useState([]);
     const [videoDevices, setVideoDevices] = React.useState([]);
@@ -99,9 +102,13 @@ const Footer = ({
         };
     }, []);
     return (
-        <footer className="h-[70px] bg-[#f8fafc] border-t border-slate-200 flex items-center justify-center px-6 shrink-0 relative w-full text-slate-800">
+        <footer
+            className={`h-[80px] bg-white border-t border-slate-200 flex items-center justify-between px-2 sm:px-6 shrink-0 z-50 transition-all duration-300 space-x-2 sm:space-x-0 w-full relative ${
+                isSidebarOpen ? "sm:pr-4" : ""
+            }`}
+        >
             {/* CENTER */}
-            <div className="pointer-events-auto flex items-center gap-3 animate-slide-up shrink-0">
+            <div className="pointer-events-auto flex items-center gap-2 sm:gap-3 animate-slide-up shrink-0">
                 {/* MIC */}
                 <div className="relative flex items-center bg-slate-100 hover:bg-slate-200 rounded-full px-1.5 transition-all duration-200 border border-slate-200">
                     <button
@@ -238,6 +245,36 @@ const Footer = ({
                     <span className="text-[18px]">🤚</span>
                 </button>
 
+                {/* REACTION */}
+                <div className="relative flex items-center shrink-0">
+                    <button
+                        onClick={() => setShowReactionMenu(!showReactionMenu)}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer border border-slate-200 ${
+                            showReactionMenu ? "bg-slate-200 text-slate-800" : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        }`}
+                        title="React"
+                    >
+                        <Smile size={18} />
+                    </button>
+
+                    {showReactionMenu && (
+                        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-white border border-slate-200 shadow-xl rounded-full py-2 px-3 z-50 flex gap-2 animate-scale-in">
+                            {["👍", "👎", "👏", "😂", "🎉", "❤️"].map(emoji => (
+                                <button
+                                    key={emoji}
+                                    onClick={() => {
+                                        onReaction?.(emoji);
+                                    }}
+                                    className="text-2xl hover:scale-125 active:scale-95 transition-transform cursor-pointer"
+                                    title={emoji}
+                                >
+                                    {emoji}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
                 {/* HOST MODERATION */}
                 {userRole === "host" ? (
                     <>
@@ -324,7 +361,7 @@ const Footer = ({
             </div>
 
             {/* RIGHT */}
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-auto flex items-center gap-4 shrink-0">
+            <div className="static sm:absolute sm:right-6 sm:top-1/2 sm:-translate-y-1/2 pointer-events-auto flex items-center gap-2 sm:gap-4 shrink-0">
                 {/* NOTES */}
                 <button 
                     onClick={() => {

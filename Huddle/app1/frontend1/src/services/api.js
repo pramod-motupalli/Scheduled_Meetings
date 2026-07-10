@@ -66,6 +66,13 @@ microserviceApi.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Automatically attach X-Api-Key to microservice API calls
+    const apiKey = import.meta.env.VITE_X_API_KEY || sessionStorage.getItem("api_key") || localStorage.getItem("api_key") || "";
+    if (apiKey && apiKey !== "null" && apiKey !== "undefined") {
+      config.headers["X-Api-Key"] = apiKey;
+    }
+    
     return config;
   },
   (error) => {

@@ -186,34 +186,10 @@ def get_user_by_identifier(product, uuid_value, name=None, email=None):
         return user
 
 class ScheduleMeetingView(APIView):
-    permission_classes = [AllowAny]
-
     def post(self, request):
-
-        # Get API Key from Header
-        raw_api_key = request.headers.get("X-Api-Key")
-
-        valid_api_key_obj = None
-        if raw_api_key:
-            for api_key_obj in ProductApiKey.objects.filter(is_active=True):
-                if check_password(raw_api_key, api_key_obj.api_key_hash):
-                    valid_api_key_obj = api_key_obj
-                    break
-            if not valid_api_key_obj:
-                return Response(
-                    {"error": "Invalid API Key"},
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-        else:
-            # Fallback to first active API key when no key is provided.
-            valid_api_key_obj = ProductApiKey.objects.filter(is_active=True).first()
-            if not valid_api_key_obj:
-                return Response(
-                    {"error": "No active API key found"},
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-
-        product = valid_api_key_obj.product
+        valid_api_key_obj = getattr(request, 'api_key_obj', None)
+        raw_api_key = getattr(request, 'raw_api_key', None)
+        product = getattr(request, 'api_key_product', None)
 
         # Request Data
         email = request.data.get("email")
@@ -377,7 +353,7 @@ class ListMeetingsView(APIView):
         ).distinct().order_by('scheduled_start')
         
         data = []
-        raw_api_key = request.headers.get("X-Api-Key")
+        raw_api_key = getattr(request, 'raw_api_key', None)
         now_time = timezone.now()
         for meeting in meetings:
             # Check if status should be updated to ongoing (Bug 3)
@@ -947,7 +923,7 @@ class InviteParticipantView(APIView):
         # this meeting's product — this guarantees the letter in the URL is always the
         # same as the one generated at meeting creation, regardless of what header the
         # caller sends.
-        raw_api_key = request.headers.get("X-Api-Key")
+        raw_api_key = getattr(request, 'raw_api_key', None)
         if not raw_api_key:
             # Try to get the raw key value from settings (set at startup) or fall back
             raw_api_key = getattr(settings, "X_API_KEY", None) or "kTh35Mm1gA8lX4StIrpfYIvtmStj2XCUVMm3nIdrnU8"

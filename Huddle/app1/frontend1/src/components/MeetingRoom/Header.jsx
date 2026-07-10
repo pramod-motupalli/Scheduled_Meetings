@@ -68,21 +68,21 @@ const Header = ({
     };
 
     return (
-        <header className="h-[64px] bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 w-full">
+        <header className="h-[64px] bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-6 shrink-0 w-full">
             {/* LEFT - TIME & CODE */}
-            <div className="pointer-events-auto flex items-center gap-3 text-sm font-medium text-slate-800">
-                <span className="tracking-wide">{timeStr}</span>
-                <span className="text-slate-300">|</span>
+            <div className="pointer-events-auto flex items-center gap-1 sm:gap-3 text-xs sm:text-sm font-medium text-slate-800">
+                <span className="tracking-wide hidden sm:inline">{timeStr}</span>
+                <span className="text-slate-300 hidden sm:inline">|</span>
                 <span
                     onClick={handleCopy}
-                    className="hover:text-slate-600 cursor-pointer transition-colors font-mono"
+                    className="hover:text-slate-600 cursor-pointer transition-colors font-mono hidden sm:inline"
                     title="Copy Meeting ID"
                 >
                     {meeting_id || "huddle-room"}
                 </span>
                 <button
                     onClick={handleCopy}
-                    className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 sm:w-6 sm:h-6 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                     <Info
                         size={15}
@@ -105,7 +105,7 @@ const Header = ({
                             setIsRecording(true);
                         }
                     }}
-                    className={`ml-4 flex items-center gap-1.5 px-3 py-1 h-[28px] rounded-full text-[11px] font-bold transition-all duration-200 cursor-pointer border border-slate-200 ${
+                    className={`ml-1 sm:ml-4 flex items-center gap-1.5 px-2 sm:px-3 py-1 h-[28px] rounded-full text-[10px] sm:text-[11px] font-bold transition-all duration-200 cursor-pointer border border-slate-200 ${
                         isRecording
                             ? "bg-[#ea4335] text-white animate-pulse"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"

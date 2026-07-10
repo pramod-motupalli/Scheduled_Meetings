@@ -25,20 +25,12 @@ export default function ScheduledMeetings({ refreshTrigger }) {
   const fetchMeetings = async () => {
     try {
       setLoading(true);
-      const headers = {};
-      if (token && token !== "null" && token !== "undefined") {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-      if (apiKey && apiKey !== "null" && apiKey !== "undefined") {
-        headers["x-api-key"] = apiKey;
-      }
       const email = localStorage.getItem("email");
       const params = {};
       if (email) {
         params["email"] = email;
       }
       const response = await microserviceApi.get("/api/meetings/", {
-        headers,
         params,
       });
       // sort by latest date first
@@ -114,15 +106,7 @@ export default function ScheduledMeetings({ refreshTrigger }) {
       return;
     }
     try {
-      const headers = {};
-      if (token && token !== "null" && token !== "undefined") {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-      if (apiKey && apiKey !== "null" && apiKey !== "undefined") {
-        headers["x-api-key"] = apiKey;
-      }
       const response = await microserviceApi.delete("/api/meetings/", {
-        headers,
         params: { meeting_id: meetingId },
         data: { meeting_id: meetingId }
       });
@@ -288,11 +272,6 @@ export default function ScheduledMeetings({ refreshTrigger }) {
                               {
                                 meeting_id: selectedMeeting.id,
                                 email: singleEmail,
-                              },
-                              {
-                                headers: {
-                                  "X-Api-Key": apiKey,
-                                },
                               }
                             );
                           });

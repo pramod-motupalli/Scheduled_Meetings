@@ -69,18 +69,7 @@ const [showSummary, setShowSummary] = useState(false);
     try {
       const token = localStorage.getItem("token");
       const apiKey = import.meta.env.VITE_X_API_KEY || sessionStorage.getItem("api_key") || localStorage.getItem("api_key") || "";
-      const headers = {
-        "Content-Type": "application/json"
-      };
-      if (token && token !== "null" && token !== "undefined") {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-      if (apiKey && apiKey !== "null" && apiKey !== "undefined") {
-        headers["x-api-key"] = apiKey;
-      }
-
       const res = await microserviceApi.delete("/api/meetings/", {
-        headers,
         data: {
           meeting_ids: Array.from(selectedMeetings)
         }
@@ -203,19 +192,12 @@ const [showSummary, setShowSummary] = useState(false);
       try {
         const token = localStorage.getItem("token");
         const apiKey = import.meta.env.VITE_X_API_KEY || sessionStorage.getItem("api_key") || localStorage.getItem("api_key") || "";
-        const headers = {};
-        if (token && token !== "null" && token !== "undefined") {
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-        if (apiKey && apiKey !== "null" && apiKey !== "undefined") {
-          headers["x-api-key"] = apiKey;
-        }
         const email = localStorage.getItem("email");
         const params = {};
         if (email) {
           params["email"] = email;
         }
-        const res = await microserviceApi.get("/api/meetings/", { headers, params });
+        const res = await microserviceApi.get("/api/meetings/", { params });
         if (res.data) {
           setDbMeetings(res.data);
         }

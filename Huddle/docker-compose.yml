@@ -24,7 +24,7 @@ services:
     image: redis:7-alpine
     container_name: redis-cache
     ports:
-      - "6379:6379"
+      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -40,7 +40,10 @@ services:
       dockerfile: docker/django/Dockerfile
     container_name: shared-microservice
     env_file:
-      - .env
+      - ./microservices/.env
+    environment:
+      - REDIS_URL=redis://redis-cache:6379/0
+      - DOCKER_ENV=True
     ports:
       - "8000:8000"
     depends_on:
@@ -63,7 +66,7 @@ services:
       dockerfile: Dockerfile
     container_name: auth-backend1
     env_file:
-      - .env
+      - ./app1/backend1/.env
     ports:
       - "5000:5000"
     depends_on:
@@ -104,10 +107,50 @@ services:
       context: ./app1/frontend1
       dockerfile: Dockerfile
     container_name: react-app1
+    environment:
+      - VITE_DOCKER=true
     ports:
       - "3000:3000"
     depends_on:
       - backend1
       - microservice
 
- 
+  # ----------------------------------------------------
+  # LIVEKIT SERVER (LOCAL)
+  # ----------------------------------------------------
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: livekit-server
+    command: --node-ip=127.0.0.1 --dev
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    environment:
+      - "LIVEKIT_KEYS=devkey: secret"
+      - LIVEKIT_REDIS_URL=redis://redis-cache:6379/0
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+
+  # ----------------------------------------------------
+  # CLOUDFLARED TUNNEL (EXPOSES APP1)
+  # ----------------------------------------------------
+  cloudflare-frontend:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-frontend
+    restart: unless-stopped
+    command: tunnel --url http://app1:3000
+    depends_on:
+      - app1
+
+  # ----------------------------------------------------
+  # CLOUDFLARED TUNNEL (EXPOSES LIVEKIT)
+  # ----------------------------------------------------
+  cloudflare-livekit:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-livekit
+    restart: unless-stopped
+    command: tunnel --url http://livekit:7880
+    depends_on:
+      - livekit
