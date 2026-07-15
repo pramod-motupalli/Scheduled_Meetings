@@ -82,15 +82,16 @@ const VideoStage = ({
                 name: cleanName,
                 isLocal: false,
                 stream: rStream ? rStream.stream : null,
-                // Default to "on" until we've actually heard otherwise for this user_id
+                // Fallback to backend state if LiveKit state isn't available yet,
+                // or default to false (muted) if no track exists.
                 micOn:
                     remoteMicStates[p.user_id] !== undefined
                         ? remoteMicStates[p.user_id]
-                        : true,
+                        : (p.mic_on !== undefined ? p.mic_on : false),
                 videoOn:
                     remoteVideoStates[p.user_id] !== undefined
                         ? remoteVideoStates[p.user_id]
-                        : true,
+                        : (p.video_on !== undefined ? p.video_on : false),
             });
         });
 
@@ -164,7 +165,7 @@ const VideoStage = ({
 
     const getRowSizes = (count) => {
         if (count <= 0) return [];
-        
+
         if (isMobile) {
             if (count === 1) return [1];
             if (count === 2) return [1, 1]; // 2 rows of 1
@@ -208,11 +209,10 @@ const VideoStage = ({
 
     return (
         <div
-            className={`relative rounded-none overflow-hidden bg-slate-50 h-auto transition-all duration-300 ${
-                showHandRaise || showParticipants || showMenuPage
-                    ? "w-[80%]"
+            className={`relative rounded-none overflow-hidden bg-slate-50 h-auto transition-all duration-300 ${showHandRaise || showParticipants || showMenuPage
+                    ? "w-full sm:w-[80%]"
                     : "w-full"
-            }`}
+                }`}
         >
             {/* 🔥 FIX 2: Hidden anchor keeps your local camera hardware permanently active! */}
             <video
@@ -223,17 +223,16 @@ const VideoStage = ({
                 className="hidden"
             />
             {/* ================= MAIN GRID / STAGE ================= */}
-            <div className="relative w-full h-full p-2 bg-[#f8fafc]">
-                <div className="relative w-full h-full overflow-hidden rounded-none">
+            <div className="relative w-full h-full p-2 bg-[#f8fafc] flex flex-col">
+                <div className="relative w-full flex-1 overflow-hidden rounded-none">
                     <div className="w-full h-full px-4 py-2 flex flex-col gap-4">
                         {participantRows.map((row, rowIndex) => (
                             <div
                                 key={rowIndex}
-                                className={`flex gap-2 sm:gap-4 flex-1 ${
-                                            participantRows[0]?.length < participantRows[1]?.length && rowIndex === 0
-                                                ? "justify-center"
-                                                : ""
-                                        }`}
+                                className={`flex gap-2 sm:gap-4 flex-1 ${participantRows[0]?.length < participantRows[1]?.length && rowIndex === 0
+                                        ? "justify-center"
+                                        : ""
+                                    }`}
                             >
                                 {row.map((member, index) => {
                                     const globalIndex =
@@ -243,16 +242,15 @@ const VideoStage = ({
                                     const hasVideo = member.isLocal
                                         ? isVideoOn
                                         : !!member.stream &&
-                                          member.videoOn !== false;
+                                        member.videoOn !== false;
 
                                     return (
                                         <div
                                             key={`${member.id}-${index}`}
-                                            className={`relative rounded-[24px] overflow-hidden bg-slate-50 shadow-sm transition-all duration-300 flex-1 ${
-                                                activeSpeakers.includes(member.realUserId) 
-                                                    ? 'ring-2 ring-blue-500 border-none scale-[1.02] z-10' 
+                                            className={`relative rounded-[24px] overflow-hidden bg-slate-50 shadow-sm transition-all duration-300 flex-1 ${activeSpeakers.includes(member.realUserId)
+                                                    ? 'ring-2 ring-blue-500 border-none scale-[1.02] z-10'
                                                     : 'border border-slate-200'
-                                            }`}
+                                                }`}
                                         >
                                             {/* INJECT LIVE VIDEO OR GRADIENT INITIALS */}
                                             {hasVideo ? (
@@ -264,14 +262,14 @@ const VideoStage = ({
                                                         const srcObj =
                                                             member.isLocal
                                                                 ? localVideoRef
-                                                                      ?.current
-                                                                      ?.srcObject
+                                                                    ?.current
+                                                                    ?.srcObject
                                                                 : member.stream;
                                                         if (
                                                             el &&
                                                             srcObj &&
                                                             el.srcObject !==
-                                                                srcObj
+                                                            srcObj
                                                         ) {
                                                             el.srcObject =
                                                                 srcObj;
@@ -279,7 +277,7 @@ const VideoStage = ({
                                                             // silently blocked by the browser, which is the most
                                                             // common reason remote audio never starts.
                                                             el.play().catch(
-                                                                () => {},
+                                                                () => { },
                                                             );
                                                         }
                                                     }}
@@ -315,9 +313,17 @@ const VideoStage = ({
                                             )}
 
                                             {activeReactions[member.realUserId] && (
-                                                <div className="absolute inset-0 z-[100] pointer-events-none flex justify-center w-full h-full">
-                                                    <span className="text-6xl drop-shadow-2xl animate-emoji-float absolute top-[-10vh]">{activeReactions[member.realUserId]}</span>
-                                                </div>
+                                                <>
+                                                    <div className="absolute inset-0 z-[100] pointer-events-none flex justify-center w-full h-full">
+                                                        <span className="text-6xl drop-shadow-2xl animate-emoji-float absolute top-[-10vh]">{activeReactions[member.realUserId]}</span>
+                                                    </div>
+                                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                                                        <div className="bg-slate-900/70 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg animate-fade-in-up">
+                                                            <span className="text-md">{activeReactions[member.realUserId]}</span>
+                                                            {/* <span className="text-white text-xs font-medium whitespace-nowrap">{member.name}</span> */}
+                                                        </div>
+                                                    </div>
+                                                </>
                                             )}
 
                                             <div className="absolute bottom-3 left-3 z-20">
@@ -334,35 +340,42 @@ const VideoStage = ({
                         ))}
                     </div>
 
-                    {/* ================= PAGINATION CONTROLS ================= */}
-                    {activeParticipants.length > PAGE_SIZE && (
-                        <>
-                            <button
-                                onClick={() =>
-                                    canGoLeft &&
-                                    setCurrentPage((p) => Math.max(0, p - 1))
-                                }
-                                className={`absolute left-1 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${canGoLeft ? "bg-black text-white border-black hover:scale-105" : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"}`}
-                                disabled={!canGoLeft}
-                            >
-                                <ChevronLeft size={22} />
-                            </button>
-                            <button
-                                onClick={() =>
-                                    canGoRight &&
-                                    setCurrentPage((p) =>
-                                        Math.min(totalPages - 1, p + 1),
-                                    )
-                                }
-                                className={`absolute right-1 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg border transition-all duration-200 ${canGoRight ? "bg-black text-white border-black hover:scale-105" : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"}`}
-                                disabled={!canGoRight}
-                            >
-                                <ChevronRight size={22} />
-                            </button>
-                        </>
-                    )}
+                </div>
 
-                    {activeParticipants.length <= 1 &&
+                {/* ================= PAGINATION CONTROLS ================= */}
+                {activeParticipants.length > PAGE_SIZE && (
+                    <div className="flex items-center justify-center gap-6 py-2 shrink-0">
+                        <button
+                            onClick={() =>
+                                canGoLeft &&
+                                setCurrentPage((p) => Math.max(0, p - 1))
+                            }
+                            className={`w-6 h-6 rounded-full flex items-center justify-center shadow-md border transition-all duration-200 ${canGoLeft ? "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:scale-105" : "bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed"}`}
+                            disabled={!canGoLeft}
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+
+                        <span className="text-sm font-medium text-slate-500">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+
+                        <button
+                            onClick={() =>
+                                canGoRight &&
+                                setCurrentPage((p) =>
+                                    Math.min(totalPages - 1, p + 1),
+                                )
+                            }
+                            className={`w-6 h-6 rounded-full flex items-center justify-center shadow-md border transition-all duration-200 ${canGoRight ? "bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:scale-105" : "bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed"}`}
+                            disabled={!canGoRight}
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
+                )}
+
+                {activeParticipants.length <= 1 &&
                         liveParticipants.length <= 1 &&
                         remoteStreams.length === 0 && (
                             <div className="absolute top-6 left-1/2 text-black -translate-x-1/2 z-30 bg-white backdrop-blur-md border  shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-2xl px-6 py-3 flex items-center gap-3 animate-fade-in">
@@ -379,9 +392,7 @@ const VideoStage = ({
                                 </div>
                             </div>
                         )}
-                </div>
             </div>
-            )
         </div>
     );
 };

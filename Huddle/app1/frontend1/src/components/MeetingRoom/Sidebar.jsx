@@ -335,7 +335,7 @@ const Sidebar = ({
         <>
             {/* PARTICIPANTS & HAND RAISE PANEL */}
             {(showHandRaise || showParticipants) && !showMenuPage && (
-                <div className="w-[20%] bg-white rounded-[24px] border border-slate-200/80 p-4 flex flex-col h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-slide-in-right">
+                <div className="absolute sm:relative inset-0 sm:inset-auto z-50 sm:z-auto w-full sm:w-[20%] sm:min-w-[300px] bg-white rounded-[24px] sm:rounded-[24px] border border-slate-200/80 p-4 flex flex-col h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-slide-in-right">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-[17px] font-bold text-slate-800 flex items-center gap-2">
                             {showHandRaise ? (
@@ -454,7 +454,7 @@ const Sidebar = ({
 
             {/* MENU PANEL (Chat/Notes/AI) */}
             {showMenuPage && (
-                <div className="w-[20%] bg-white rounded-[24px] border border-slate-200/80 p-4 h-full flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-slide-in-right">
+                <div className="absolute sm:relative inset-0 sm:inset-auto z-50 sm:z-auto w-full sm:w-[20%] sm:min-w-[300px] bg-white rounded-[24px] border border-slate-200/80 p-4 h-full flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-slide-in-right">
                     <div className="flex items-center justify-between border-b border-slate-200/60 pb-3">
                         <h2 className="text-[18px] font-bold text-slate-800">
                             Menu
@@ -602,7 +602,7 @@ const Sidebar = ({
 
             {/* ADD PARTICIPANTS PANEL */}
             {showAddParticipant && !showMenuPage && (
-                <div className="w-[20%] bg-white rounded-[24px] border border-slate-200/80 p-4 flex flex-col h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-slide-in-right">
+                <div className="absolute sm:relative inset-0 sm:inset-auto z-50 sm:z-auto w-full sm:w-[20%] sm:min-w-[300px] bg-white rounded-[24px] border border-slate-200/80 p-4 flex flex-col h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] animate-slide-in-right">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-5">
                         <h2 className="text-[17px] font-bold text-slate-800 flex items-center gap-2">

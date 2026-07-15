@@ -61,6 +61,7 @@ const Footer = ({
     const [activeVideoId, setActiveVideoId] = React.useState("");
     const [showAudioMenu, setShowAudioMenu] = React.useState(false);
     const [showVideoMenu, setShowVideoMenu] = React.useState(false);
+    const [showMobileMenu, setShowMobileMenu] = React.useState(false);
 
     const hasAutoSelected = React.useRef(false);
 
@@ -103,7 +104,7 @@ const Footer = ({
     }, []);
     return (
         <footer
-            className={`h-[80px] bg-white border-t border-slate-200 flex items-center justify-between px-2 sm:px-6 shrink-0 z-50 transition-all duration-300 space-x-2 sm:space-x-0 w-full relative ${
+            className={`h-[80px] bg-white border-t border-slate-200 flex items-center justify-center px-2 sm:px-6 shrink-0 z-50 transition-all duration-300 space-x-2 sm:space-x-0 w-full relative ${
                 isSidebarOpen ? "sm:pr-4" : ""
             }`}
         >
@@ -215,7 +216,7 @@ const Footer = ({
                 <button
                     onClick={handleShareClick}
                     disabled={isAnotherUserSharing && !isLocalScreenSharing}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-205 cursor-pointer hover:scale-110 active:scale-95 border border-slate-200 ${
+                    className={`hidden sm:flex w-10 h-10 rounded-full items-center justify-center transition-all duration-205 cursor-pointer hover:scale-110 active:scale-95 border border-slate-200 ${
                         isAnotherUserSharing && !isLocalScreenSharing
                             ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                             : isLocalScreenSharing
@@ -231,7 +232,7 @@ const Footer = ({
                     <Share size={16} />
                 </button>
 
-                <div className="w-px h-6 bg-slate-200"></div>
+                <div className="hidden sm:block w-px h-6 bg-slate-200"></div>
 
                 {/* HAND */}
                 <button
@@ -246,7 +247,7 @@ const Footer = ({
                 </button>
 
                 {/* REACTION */}
-                <div className="relative flex items-center shrink-0">
+                <div className="hidden sm:flex relative items-center shrink-0">
                     <button
                         onClick={() => setShowReactionMenu(!showReactionMenu)}
                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer border border-slate-200 ${
@@ -277,7 +278,7 @@ const Footer = ({
 
                 {/* HOST MODERATION */}
                 {userRole === "host" ? (
-                    <>
+                    <div className="hidden sm:flex items-center gap-2">
                         {/* USER PLUS */}
                         <button
                             onClick={onAddParticipantsClick}
@@ -344,12 +345,83 @@ const Footer = ({
                                 </button>
                             </div>
                         </div>
-                    </>
+                    </div>
                 ) : (
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 bg-slate-100 border border-slate-200">
+                    <div className="hidden sm:flex w-10 h-10 rounded-full items-center justify-center text-slate-400 bg-slate-100 border border-slate-200">
                         <MoreVertical size={16} />
                     </div>
                 )}
+                
+                {/* MOBILE MORE OPTIONS */}
+                <div className="relative flex sm:hidden items-center shrink-0">
+                    <button
+                        onClick={() => setShowMobileMenu(!showMobileMenu)}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer border border-slate-200 ${
+                            showMobileMenu ? "bg-slate-200 text-slate-800" : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        }`}
+                        title="More Options"
+                    >
+                        <MoreVertical size={16} />
+                    </button>
+                    
+                    {showMobileMenu && (
+                        <div className="absolute bottom-14 right-0 bg-white border border-slate-200 shadow-xl rounded-xl py-3 w-56 z-50 flex flex-col gap-1 animate-scale-in origin-bottom-right">
+                            {/* Reactions Row */}
+                            <div className="flex items-center justify-between px-4 py-2 bg-slate-50/50 rounded-lg mx-2 mb-1 border border-slate-100">
+                                {["👍", "👎", "👏", "😂", "🎉", "❤️"].map(emoji => (
+                                    <button
+                                        key={emoji}
+                                        onClick={() => {
+                                            onReaction?.(emoji);
+                                            setShowMobileMenu(false);
+                                        }}
+                                        className="text-xl hover:scale-125 active:scale-95 transition-transform cursor-pointer"
+                                        title={emoji}
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 w-full text-left" onClick={() => { handleShareClick(); setShowMobileMenu(false); }}>
+                                <Share size={16} /> <span className="text-sm font-medium">Share Screen</span>
+                            </button>
+                            
+                            <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 w-full text-left" onClick={() => { setActiveMenu?.("chat"); setShowMenuPage(true); setShowMobileMenu(false); setShowParticipants?.(false); setShowHandRaise?.(false); }}>
+                                <MessageSquare size={16} /> <span className="text-sm font-medium">Chat {unreadChatCount > 0 && <span className="text-red-500 font-bold">({unreadChatCount})</span>}</span>
+                            </button>
+                            
+                            <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 w-full text-left" onClick={() => { setActiveMenu?.("notes"); setShowMenuPage(true); setShowMobileMenu(false); setShowParticipants?.(false); setShowHandRaise?.(false); }}>
+                                <FilePenLine size={16} /> <span className="text-sm font-medium">Notes</span>
+                            </button>
+                            
+                            <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 w-full text-left" onClick={() => { setActiveMenu?.("assistance"); setShowMenuPage(true); setShowMobileMenu(false); setShowParticipants?.(false); setShowHandRaise?.(false); }}>
+                                <LayoutGrid size={16} /> <span className="text-sm font-medium">Assistance</span>
+                            </button>
+                            
+                            {userRole === "host" && (
+                               <>
+                                 <div className="w-full h-px bg-slate-100 my-1"></div>
+                                 <div className="px-4 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Host Controls</div>
+                                 <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-slate-700 w-full text-left" onClick={() => { onAddParticipantsClick(); setShowMobileMenu(false); }}>
+                                     <UserPlus size={16} /> <span className="text-sm font-medium">Add Participants</span>
+                                 </button>
+                                 <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-600 w-full text-left" onClick={() => { setIsKickDialogOpen(true); setShowMobileMenu(false); }}>
+                                     <UserMinus size={16} /> <span className="text-sm font-medium">Kick Participant</span>
+                                 </button>
+                                 <button className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-600 w-full text-left" onClick={() => {
+                                     setShowMobileMenu(false);
+                                     if (window.confirm("Are you sure you want to end the meeting for all participants?")) {
+                                         handleEndMeeting();
+                                     }
+                                 }}>
+                                     <PhoneOff size={16} /> <span className="text-sm font-medium">End Meeting</span>
+                                 </button>
+                               </>
+                            )}
+                        </div>
+                    )}
+                </div>
                 {/* LEAVE CALL BUTTON */}
                 <button
                     onClick={handleLeave}
@@ -361,7 +433,7 @@ const Footer = ({
             </div>
 
             {/* RIGHT */}
-            <div className="static sm:absolute sm:right-6 sm:top-1/2 sm:-translate-y-1/2 pointer-events-auto flex items-center gap-2 sm:gap-4 shrink-0">
+            <div className="hidden sm:absolute sm:right-6 sm:top-1/2 sm:-translate-y-1/2 pointer-events-auto sm:flex items-center gap-2 sm:gap-4 shrink-0">
                 {/* NOTES */}
                 <button 
                     onClick={() => {
