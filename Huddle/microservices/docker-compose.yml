@@ -36,14 +36,19 @@ services:
   # ----------------------------------------------------
   microservice:
     build:
-      context: ./microservices
-      dockerfile: docker/django/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: shared-microservice
     env_file:
-      - ./microservices/.env
+      - .env
     environment:
       - REDIS_URL=redis://redis-cache:6379/0
       - DOCKER_ENV=True
+      - POSTGRES_HOST=postgres-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=backend
+      - POSTGRES_PORT=5432
     ports:
       - "8000:8000"
     depends_on:
@@ -56,64 +61,6 @@ services:
       python manage.py migrate &&
       python manage.py runserver 0.0.0.0:8000
       "
-
-  # ----------------------------------------------------
-  # BACKEND1 (APP1 AUTHENTICATION SERVICE)
-  # ----------------------------------------------------
-  backend1:
-    build:
-      context: ./app1/backend1
-      dockerfile: Dockerfile
-    container_name: auth-backend1
-    env_file:
-      - ./app1/backend1/.env
-    ports:
-      - "5000:5000"
-    depends_on:
-      postgres-db:
-        condition: service_healthy
-    command: >
-      sh -c "
-      python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:5000
-      "
-
-  # ----------------------------------------------------
-  # BACKEND2 (APP2 AUTHENTICATION SERVICE)
-  # ----------------------------------------------------
-  #backend2:
-    #build:
-      #context: ./app2/backend2
-      #dockerfile: Dockerfile
-    #container_name: auth-backend2
-    #env_file:
-      #- .env
-    #ports:
-      #- "8003:8003"
-    #depends_on:
-      #postgres-db:
-       # condition: service_healthy
-    #command: >
-      #sh -c "
-      #python manage.py migrate &&
-      #python manage.py runserver 0.0.0.0:8003
-     # "
-
-  # ----------------------------------------------------
-  # APP1 (REACT HUDDLE APPLICATION 1)
-  # ----------------------------------------------------
-  app1:
-    build:
-      context: ./app1/frontend1
-      dockerfile: Dockerfile
-    container_name: react-app1
-    environment:
-      - VITE_DOCKER=true
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend1
-      - microservice
 
   # ----------------------------------------------------
   # LIVEKIT SERVER (LOCAL)
@@ -132,17 +79,6 @@ services:
     depends_on:
       redis-cache:
         condition: service_healthy
-
-  # ----------------------------------------------------
-  # CLOUDFLARED TUNNEL (EXPOSES APP1)
-  # ----------------------------------------------------
-  cloudflare-frontend:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflare-frontend
-    restart: unless-stopped
-    command: tunnel --url http://app1:3000
-    depends_on:
-      - app1
 
   # ----------------------------------------------------
   # CLOUDFLARED TUNNEL (EXPOSES LIVEKIT)

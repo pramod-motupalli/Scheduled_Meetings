@@ -1,6 +1,5 @@
-# Python
+# Python / Django
 __pycache__/
-<<<<<<< HEAD
 *.py[cod]
 *$py.class
 *.so
@@ -11,7 +10,11 @@ dist/
 *.egg
 MANIFEST
 
-# Virtual environments - CRITICAL
+# Databases
+db.sqlite3
+db.sqlite3-journal
+
+# Virtual environments
 venv/
 env/
 ENV/
@@ -19,17 +22,16 @@ ENV/
 env.bak/
 venv.bak/
 
-# Django
+# Django files
 *.log
 local_settings.py
-db.sqlite3-journal
 media/
 !media/.gitkeep
 staticfiles/
 static/
 !static/.gitkeep
 
-# Environment variables - NEVER COMMIT
+# Environment variables (NEVER commit secrets)
 .env
 .env.*
 !.env.example
@@ -43,36 +45,17 @@ celerybeat.pid
 .coverage
 .coverage.*
 htmlcov/
-.pytest_cache/
 
 # mypy / type checking
 .mypy_cache/
 .dmypy.json
 dmypy.json
 
-# Jupyter
+# Jupyter Notebooks
 .ipynb_checkpoints
-=======
-*.pyc
 
-# Virtual environment
-venv/
-env/
-
-# Environment variables
-.env
-
-# Database
-db.sqlite3
-
-# Static/media
-staticfiles/
-media/
-
-# IDE
+# IDE / Editors
 .vscode/
 .idea/
-
-# Docker
-*.log
->>>>>>> Team-B
+*.swp
+*.swo

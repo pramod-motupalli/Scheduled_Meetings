@@ -16,3 +16,4 @@ celery
 pyjwt
 python-decouple
 django-extensions
+livekit-api

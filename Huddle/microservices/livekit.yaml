@@ -2,7 +2,7 @@ port: 7880
 
 # The node_ip is REQUIRED for local development so the browser knows where to send WebRTC video traffic.
 # If you are testing on your phone/other devices, change this to your computer's Wi-Fi IP (e.g. 192.168.0.123)
-node_ip: 127.0.0.1
+node_ip: 192.168.0.132
 
 keys:
   devkey: secret

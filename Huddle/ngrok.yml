@@ -1,4 +1,5 @@
 version: "2"
+authtoken: 3GDewCgBmeVwKx3W15p9YANoVUK_s5spx2KLEgwbkncreA6t
 tunnels:
   frontend:
     addr: app1:3000
