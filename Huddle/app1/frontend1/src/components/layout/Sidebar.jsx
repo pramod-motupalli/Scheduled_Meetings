@@ -3,15 +3,10 @@ import { Redo2 } from "lucide-react";
 
 const navItems = [
   { image: "/LayoutDashboard.svg", label: "Dashboard" },
-  { image: "/MessageSquare.svg", label: "Messages" },
-  { image: "/Calendar.svg", label: "Calendar" },
-  { image: "/Zap.svg", label: "Integrations" },
-  { image: "/Megaphone.svg", label: "Announcements" },
-  { image: "/Monitor.svg", label: "Screens" },
 ];
 
 export default function Sidebar() {
-  const [active, setActive] = useState("Messages");
+  const [active, setActive] = useState("Dashboard");
   const [user, setUser] = useState({ name: "Host User", email: "host@example.com", role: "Host" });
 
   useEffect(() => {

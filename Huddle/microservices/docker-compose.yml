@@ -1,21 +1,5 @@
 services:
-  # ----------------------------------------------------
-  # DATABASE (POSTGRESQL)
-  # ----------------------------------------------------
-  postgres-db:
-    image: postgres:16-alpine
-    container_name: postgres-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: backend
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+
 
   # ----------------------------------------------------
   # CACHE (REDIS)
@@ -44,16 +28,9 @@ services:
     environment:
       - REDIS_URL=redis://redis-cache:6379/0
       - DOCKER_ENV=True
-      - POSTGRES_HOST=postgres-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=backend
-      - POSTGRES_PORT=5432
     ports:
       - "8000:8000"
     depends_on:
-      postgres-db:
-        condition: service_healthy
       redis-cache:
         condition: service_healthy
     command: >
@@ -62,31 +39,3 @@ services:
       python manage.py runserver 0.0.0.0:8000
       "
 
-  # ----------------------------------------------------
-  # LIVEKIT SERVER (LOCAL)
-  # ----------------------------------------------------
-  livekit:
-    image: livekit/livekit-server:latest
-    container_name: livekit-server
-    command: --node-ip=127.0.0.1 --dev
-    ports:
-      - "7880:7880"
-      - "7881:7881"
-      - "7882:7882/udp"
-    environment:
-      - "LIVEKIT_KEYS=devkey: secret"
-      - LIVEKIT_REDIS_URL=redis://redis-cache:6379/0
-    depends_on:
-      redis-cache:
-        condition: service_healthy
-
-  # ----------------------------------------------------
-  # CLOUDFLARED TUNNEL (EXPOSES LIVEKIT)
-  # ----------------------------------------------------
-  cloudflare-livekit:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflare-livekit
-    restart: unless-stopped
-    command: tunnel --url http://livekit:7880
-    depends_on:
-      - livekit

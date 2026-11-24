@@ -77,19 +77,7 @@ ASGI_APPLICATION = 'backend.asgi.application'
 import urllib.parse as urlparse
 
 # Database configuration
-if os.getenv("DOCKER_ENV"):
-    # Running inside Docker — use postgres-db container via POSTGRES_* vars
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'backend'),
-            'USER': os.getenv('POSTGRES_USER', 'postgres'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-            'HOST': os.getenv('POSTGRES_HOST', 'postgres-db'),
-            'PORT': int(os.getenv('POSTGRES_PORT', 5432)),
-        }
-    }
-elif env == 'production':
+if env == 'production':
     database_url = os.getenv("DATABASE_URL")
     if not database_url:
         raise ValueError("DATABASE_URL environment variable is required for production.")
