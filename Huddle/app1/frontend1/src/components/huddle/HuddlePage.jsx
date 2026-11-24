@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import ChatList from "../chat/ChatList";
+import React, { useState, useEffect } from "react";
 import SessionCard from "./SessionCard";
 import CreateHuddle from "./CreateHuddle";
 import ScheduledMeetings from "./ScheduledMeetings";
@@ -22,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { microserviceApi } from "@/services/api";
 
@@ -35,13 +33,12 @@ import { useNavigate } from "react-router-dom";
 
 
 export default function HuddlePage() {
-  const [sessionsList, setSessionsList] = useState([]);
   const [activeTab, setActiveTab] = useState("Ongoing");
   const [ongoingFilter, setOngoingFilter] = useState("All"); // "All", "Instant", "Scheduled"
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [selectedMeetings, setSelectedMeetings] = useState(new Set());
   const [showTranscript, setShowTranscript] = useState(false);
-const [showSummary, setShowSummary] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
   const handleToggleSelect = (meetingId) => {
     setSelectedMeetings((prev) => {
       const next = new Set(prev);
@@ -88,13 +85,6 @@ const [showSummary, setShowSummary] = useState(false);
     }
   };
   const [meetingId, setMeetingId] = useState("");
-  const [pendingSession, setPendingSession] = useState(null);
-  const [statusDialog, setStatusDialog] = useState({
-    isOpen: false,
-    type: "success",
-    message: "",
-    link: ""
-  });
 
   const parseMeetingIdentifier = (input) => {
     let path = input.trim();
@@ -147,44 +137,6 @@ const [showSummary, setShowSummary] = useState(false);
       toast.error("Meeting not found or invalid link");
     }
   };
-  const handleAddSession = (meetingDetails) => {
-    const newSession = {
-      id: Date.now(),
-      project: "PROJECT STARLIGHT",
-      title: meetingDetails.title,
-      description:
-        meetingDetails.description || "No description provided.",
-      time: `${meetingDetails.startTime} – ${meetingDetails.endTime}`,
-      participants: meetingDetails.participants || 4,
-      status: "Scheduled",
-      date: meetingDetails.startDate,
-    };
-
-    setPendingSession(newSession);
-    setRefreshTrigger((prev) => prev + 1);
-    setActiveTab("Scheduled");
-
-    setStatusDialog({
-      isOpen: true,
-      type: "success",
-      message: "Meeting created successfully.",
-      link: meetingDetails.link || "",
-    });
-  };
-  const handleCancelSession = () => {
-    if (!pendingSession) return;
-
-    setSessionsList((prev) => prev.filter((s) => s.id !== pendingSession.id));
-    setPendingSession(null);
-
-    setStatusDialog({
-      isOpen: true,
-      type: "cancelled",
-      message: "Your meeting has been cancelled."
-    });
-  };
-
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [dbMeetings, setDbMeetings] = useState([]);
 
   useEffect(() => {
@@ -281,9 +233,6 @@ const [showSummary, setShowSummary] = useState(false);
 
   return (
     <div className="flex flex-col xl:flex-row w-full h-full overflow-y-auto xl:overflow-hidden bg-white">
-      {/* Left Sidebar */}
-      <ChatList />
-
       {/* Middle Section */}
       <main className="flex flex-col flex-grow bg-white p-4 sm:p-6 xl:overflow-y-auto shrink-0 xl:shrink">
         {/* Header */}
@@ -337,8 +286,8 @@ const [showSummary, setShowSummary] = useState(false);
                 onClick={handleDeleteSelected}
                 disabled={selectedMeetings.size === 0}
                 className={`flex items-center justify-center h-9 w-9 rounded-xl border transition-all shadow-sm active:scale-95 cursor-pointer ${selectedMeetings.size > 0
-                    ? "bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:border-red-300 hover:scale-105"
-                    : "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed opacity-50"
+                  ? "bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:border-red-300 hover:scale-105"
+                  : "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed opacity-50"
                   }`}
                 title="Delete Selected Instant Meetings"
               >
@@ -421,133 +370,11 @@ const [showSummary, setShowSummary] = useState(false);
 
       {/* Right Sidebar */}
       <aside className="w-full xl:w-[480px] xl:max-w-[480px] bg-gray-50 xl:border-l border-t xl:border-t-0 border-gray-100 p-4 sm:p-5 flex flex-col gap-5 xl:overflow-y-auto shrink-0 transition-all duration-300">
-        <CreateHuddle onAddSession={handleAddSession} onCancelSession={handleCancelSession} />
+        <CreateHuddle />
         <MiniCalendar />
       </aside>
 
-      {/* Reusable Status Dialog (Success / Cancelled) */}
-      <Dialog open={statusDialog.isOpen} onOpenChange={(val) => setStatusDialog(prev => ({ ...prev, isOpen: val }))}>
-        <DialogContent className="w-[450px] p-6 bg-white border border-gray-100 rounded-2xl shadow-xl animate-scale-in max-w-[90vw]">
-          <div className="flex flex-col items-center text-center p-4">
-            {showCancelConfirm ? (
-              <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-4 text-amber-500 shadow-sm border border-amber-100">
-                <svg className="w-8 h-8 animate-bounce-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-            ) : statusDialog.type === "success" ? (
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4 text-green-500 shadow-sm border border-green-100">
-                <svg className="w-8 h-8 animate-bounce-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4 text-red-500 shadow-sm border border-red-100">
-                <svg className="w-8 h-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </div>
-            )}
 
-            <h2 className="text-xl font-extrabold text-gray-900 mb-2">
-              {statusDialog.type === "success" ? "Meeting Created!" : "Meeting Cancelled"}
-            </h2>
-
-            <p className="text-sm text-gray-500 mb-4 font-medium">
-              {showCancelConfirm ? "Are you sure you want to cancel this meeting?" : statusDialog.message}
-            </p>
-
-            <div className="w-full">
-              {showCancelConfirm ? (
-                <div className="flex gap-3 w-full">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setShowCancelConfirm(false)}
-                  >
-                    No, Keep Meeting
-                  </Button>
-
-                  <Button
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                    onClick={() => {
-                      setPendingSession(null);
-                      setShowCancelConfirm(false);
-
-                      setStatusDialog({
-                        isOpen: true,
-                        type: "cancelled",
-                        message: "Your meeting has been cancelled.",
-                        link: ""
-                      });
-                    }}
-                  >
-                    Yes, Cancel Meeting
-                  </Button>
-                </div>
-              ) : statusDialog.type === "success" ? (
-                <div className="flex flex-col gap-3 w-full">
-                  {statusDialog.link && (
-                    <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-100 mb-1">
-                      <input
-                        type="text"
-                        readOnly
-                        value={statusDialog.link}
-                        className="flex-1 min-w-0 bg-transparent text-xs font-mono text-slate-600 select-all outline-none"
-                      />
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="shrink-0 text-xs px-2.5 h-7 rounded-lg border-slate-200 hover:bg-indigo-50"
-                        onClick={() => navigator.clipboard.writeText(statusDialog.link)}
-                      >
-                        Copy
-                      </Button>
-                    </div>
-                  )}
-                  <div className="flex gap-3 w-full">
-                    <Button
-                      variant="outline"
-                      className="flex-1 border-red-300 text-red-600 hover:bg-red-50 py-3 rounded-xl font-bold"
-                      onClick={() => setShowCancelConfirm(true)}
-                    >
-                      Cancel Meeting
-                    </Button>
-
-                    <Button
-                      className="flex-1 bg-[#1e2b72] hover:bg-[#152060] text-white py-3 rounded-xl font-bold shadow-md"
-                      onClick={() => {
-                        if (pendingSession) {
-                          setSessionsList((prev) => [...prev, pendingSession]);
-                          setPendingSession(null);
-                        }
-                        setStatusDialog((prev) => ({
-                          ...prev,
-                          isOpen: false,
-                        }));
-                      }}
-                    >
-                      View Scheduled
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-bold shadow-md transition-all duration-200 cursor-pointer active:scale-98"
-                  onClick={() =>
-                    setStatusDialog((prev) => ({
-                      ...prev,
-                      isOpen: false,
-                    }))
-                  }
-                >
-                  Close
-                </Button>
-              )}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={showThankYouDialog} onOpenChange={setShowThankYouDialog}>
         <DialogContent className="w-[500px] p-0 bg-white border border-gray-200 rounded-xl shadow-md">
@@ -589,10 +416,10 @@ const [showSummary, setShowSummary] = useState(false);
         />
       )}
       {showSummary && (
-  <AISummaryCard
-    closeCard={() => setShowSummary(false)}
-  />
-)}
+        <AISummaryCard
+          closeCard={() => setShowSummary(false)}
+        />
+      )}
     </div>
   );
 }
